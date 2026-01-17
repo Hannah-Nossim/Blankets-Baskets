@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<!-- cart.html -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Blankets & Baskets — Cart</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    body { 
+      font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+      min-height: 100vh;
+    }
+    .nav-link {
+      position: relative;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -4px;
+      left: 0;
+      background-color: #0d9488;
+      transition: width 0.3s ease;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    .nav-link.active::after {
+      width: 100%;
+    }
+    .mobile-menu {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+    .mobile-menu.open {
+      transform: translateX(0);
+    }
+    .cart-item {
+      transition: all 0.2s ease;
+    }
+    .cart-item:hover {
+      background-color: #f9fafb;
+    }
+    .quantity-btn {
+      transition: all 0.2s ease;
+    }
+    .quantity-btn:hover {
+      background-color: #f3f4f6;
+    }
+    .remove-btn {
+      transition: all 0.2s ease;
+    }
+    .remove-btn:hover {
+      color: #dc2626;
+    }
+    .payment-method {
+      transition: all 0.2s ease;
+    }
+    .payment-method:hover {
+      border-color: #0d9488;
+      background-color: #f0f9ff;
+    }
+    .payment-method.selected {
+      border-color: #0d9488;
+      background-color: #f0f9ff;
+    }
+    .checkout-btn {
+      transition: all 0.3s ease;
+    }
+    .checkout-btn:hover {
+      transform: scale(1.02);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+    .delivery-section {
+      transition: all 0.3s ease;
+    }
+    .form-input:focus {
+      border-color: #0d9488;
+      box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+    }
+    .validation-error {
+      border-color: #dc2626;
+    }
+    .validation-error:focus {
+      border-color: #dc2626;
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Header -->
+  <header class="bg-white shadow sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 py-3">
+      <div class="flex items-center justify-between">
+        <!-- Logo and Mobile Menu Button -->
+        <div class="flex items-center gap-4">
+          <button id="mobileMenuBtn" class="md:hidden text-gray-700">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+          <a href="index.html" class="text-2xl font-extrabold text-teal-600">blankets &amp; baskets</a>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:block">
+          <ul class="flex items-center gap-6 text-gray-700">
+            <li><a href="index.html" class="nav-link hover:text-teal-600">Home</a></li>
+            <li><a href="products.html" class="nav-link hover:text-teal-600">Products</a></li>
+            <li><a href="custom-basket.html" class="nav-link hover:text-teal-600">Custom Basket</a></li>
+            <li><a href="add-ons.html" class="nav-link hover:text-teal-600">Add-ons</a></li>
+            <li><a href="cart.html" class="nav-link hover:text-teal-600 active">Cart</a></li>
+          </ul>
+        </nav>
+
+        <!-- Cart Icon -->
+        <div class="flex items-center gap-4">
+          <a href="cart.html" id="cartLink" class="relative text-gray-700">
+            <i class="fas fa-shopping-cart text-xl"></i>
+            <span id="cartCount" class="absolute -top-2 -right-3 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Menu -->
+  <div id="mobileMenu" class="mobile-menu fixed inset-0 z-40 bg-white w-64 p-6 md:hidden">
+    <div class="flex justify-between items-center mb-8">
+      <div class="text-xl font-extrabold text-teal-600">blankets &amp; baskets</div>
+      <button id="closeMobileMenu" class="text-gray-700">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+    <nav>
+      <ul class="space-y-4 text-gray-700">
+        <li><a href="index.html" class="block py-2 hover:text-teal-600 text-lg">Home</a></li>
+        <li><a href="products.html" class="block py-2 hover:text-teal-600 text-lg">Products</a></li>
+        <li><a href="custom-basket.html" class="block py-2 hover:text-teal-600 text-lg">Custom Basket</a></li>
+        <li><a href="add-ons.html" class="block py-2 hover:text-teal-600 text-lg">Add-ons</a></li>
+        <li><a href="cart.html" class="block py-2 hover:text-teal-600 text-lg">Cart</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Page Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Your Shopping Cart</h1>
+      <p class="text-gray-600">Review your items, add delivery details, and proceed to checkout</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Left Column: Cart Items & Delivery Details -->
+      <div class="lg:col-span-2">
+        <!-- Cart Items -->
+        <div class="bg-white rounded-xl shadow mb-6">
+          <!-- Cart Items Header -->
+          <div class="border-b border-gray-200 p-6">
+            <div class="flex justify-between items-center">
+              <h2 class="text-xl font-bold text-gray-800">Cart Items</h2>
+              <button id="clearCartBtn" class="text-sm text-red-600 hover:text-red-700">
+                Clear Cart
+              </button>
+            </div>
+          </div>
+          
+          <!-- Cart Items List -->
+          <div id="cartItemsContainer" class="p-6">
+            <!-- Cart items will be dynamically loaded -->
+            <div class="text-center py-12">
+              <i class="fas fa-shopping-cart text-4xl text-gray-300 mb-4"></i>
+              <p class="text-gray-500">Your cart is empty</p>
+              <a href="products.html" class="inline-block mt-4 text-teal-600 hover:text-teal-700 font-medium">
+                Continue Shopping
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Delivery Information Section -->
+        <div id="deliverySection" class="delivery-section bg-white rounded-xl shadow p-6 mb-6" style="display: none;">
+          <h2 class="text-xl font-bold text-gray-800 mb-4">Delivery Information</h2>
+          <p class="text-gray-600 mb-6">Please provide your delivery details to proceed with checkout</p>
+          
+          <div class="space-y-4">
+            <!-- Contact Details -->
+            <div>
+              <h3 class="font-medium text-gray-800 mb-3">Contact Details</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Full Name <span class="text-red-500">*</span>
+                  </label>
+                  <input type="text" id="deliveryName" class="form-input w-full border border-gray-300 rounded-lg p-3" placeholder="John Doe" required>
+                  <div id="nameError" class="text-red-500 text-sm mt-1 hidden">Please enter your full name</div>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Phone Number <span class="text-red-500">*</span>
+                  </label>
+                  <input type="tel" id="deliveryPhone" class="form-input w-full border border-gray-300 rounded-lg p-3" placeholder="07XXXXXXXX" required>
+                  <div id="phoneError" class="text-red-500 text-sm mt-1 hidden">Please enter a valid phone number</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Delivery Address -->
+            <div>
+              <h3 class="font-medium text-gray-800 mb-3">Delivery Address</h3>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Delivery Area <span class="text-red-500">*</span>
+                  </label>
+                  <select id="deliveryArea" class="form-input w-full border border-gray-300 rounded-lg p-3" required>
+                    <option value="">Select your area</option>
+                    <option value="nairobi-cbd">Nairobi CBD (Ksh 250)</option>
+                    <option value="westlands">Westlands (Ksh 250)</option>
+                    <option value="kileleshwa">Kileleshwa (Ksh 250)</option>
+                    <option value="kilimani">Kilimani (Ksh 250)</option>
+                    <option value="lavington">Lavington (Ksh 250)</option>
+                    <option value="karen">Karen (KSh 300)</option>
+                    <option value="rongai">Rongai (KSh 350)</option>
+                    <option value="ruaka">Ruaka (KSh 270)</option>
+                    <option value="other">Other Areas (Contact for quote)</option>
+                  </select>
+                  <div id="areaError" class="text-red-500 text-sm mt-1 hidden">Please select a delivery area</div>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Street Address / Landmark <span class="text-red-500">*</span>
+                  </label>
+                  <input type="text" id="deliveryAddress" class="form-input w-full border border-gray-300 rounded-lg p-3" placeholder="e.g., ABC Building, 3rd Floor, Room 304" required>
+                  <div id="addressError" class="text-red-500 text-sm mt-1 hidden">Please enter your delivery address</div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                      Building/House Name
+                    </label>
+                    <input type="text" id="buildingName" class="form-input w-full border border-gray-300 rounded-lg p-3" placeholder="Building name">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                      Apartment/Suite Number
+                    </label>
+                    <input type="text" id="apartmentNumber" class="form-input w-full border border-gray-300 rounded-lg p-3" placeholder="Apt 304">
+                  </div>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Additional Delivery Instructions
+                  </label>
+                  <textarea id="deliveryInstructions" class="form-input w-full border border-gray-300 rounded-lg p-3" rows="3" placeholder="e.g., Call upon arrival, Leave at security desk, etc."></textarea>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Delivery Time -->
+            <div>
+              <h3 class="font-medium text-gray-800 mb-3">Delivery Time</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Preferred Date <span class="text-red-500">*</span>
+                  </label>
+                  <input type="date" id="deliveryDate" class="form-input w-full border border-gray-300 rounded-lg p-3" required>
+                  <div id="dateError" class="text-red-500 text-sm mt-1 hidden">Please select a delivery date</div>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Preferred Time Slot <span class="text-red-500">*</span>
+                  </label>
+                  <select id="deliveryTime" class="form-input w-full border border-gray-300 rounded-lg p-3" required>
+                    <option value="">Select time slot</option>
+                    <option value="10:00-12:00">10:00 AM - 12:00 PM</option>
+                    <option value="12:00-14:00">12:00 PM - 2:00 PM</option>
+                    <option value="14:00-16:00">2:00 PM - 4:00 PM</option>
+                    <option value="16:00-18:00">4:00 PM - 6:00 PM</option>
+                    <option value="18:00-20:00">6:00 PM - 8:00 PM</option>
+                  </select>
+                  <div id="timeError" class="text-red-500 text-sm mt-1 hidden">Please select a delivery time</div>
+                </div>
+              </div>
+              <p class="text-sm text-gray-500 mt-2">
+                <i class="fas fa-info-circle text-teal-500"></i>
+                Orders placed before 2 PM can be delivered same day. Next day delivery for orders after 2 PM.
+              </p>
+            </div>
+            
+            <!-- Save Delivery Info -->
+            <div class="flex items-center gap-2 pt-4 border-t border-gray-200">
+              <input type="checkbox" id="saveDeliveryInfo" class="rounded text-teal-600">
+              <label for="saveDeliveryInfo" class="text-sm text-gray-700">
+                Save this delivery information for future orders
+              </label>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex gap-3 pt-4">
+              <button id="saveDeliveryBtn" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-medium">
+                Save Delivery Details
+              </button>
+              <button id="editDeliveryBtn" class="flex-1 border border-teal-600 text-teal-600 hover:bg-teal-50 py-3 rounded-lg font-medium" style="display: none;">
+                Edit Delivery Details
+              </button>
+            </div>
+            
+            <!-- Delivery Summary (Shows after saving) -->
+            <div id="deliverySummary" class="bg-teal-50 border border-teal-100 rounded-lg p-4 mt-4" style="display: none;">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h4 class="font-bold text-teal-800 mb-2">Delivery Summary</h4>
+                  <div class="space-y-1 text-sm text-teal-700">
+                    <div id="summaryName"></div>
+                    <div id="summaryPhone"></div>
+                    <div id="summaryAddress"></div>
+                    <div id="summaryArea"></div>
+                    <div id="summaryDateTime"></div>
+                    <div id="summaryInstructions" class="text-xs text-teal-600"></div>
+                  </div>
+                </div>
+                <button id="editSummaryBtn" class="text-teal-600 hover:text-teal-700 text-sm">
+                  <i class="fas fa-edit mr-1"></i> Edit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Continue Shopping -->
+        <div class="mt-6">
+          <a href="products.html" class="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium">
+            <i class="fas fa-arrow-left"></i> Continue Shopping
+          </a>
+        </div>
+      </div>
+
+      <!-- Right Column: Order Summary & Checkout -->
+      <div class="lg:col-span-1">
+        <div class="sticky top-24">
+          <!-- Order Summary -->
+          <div class="bg-white rounded-xl shadow p-6 mb-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Order Summary</h2>
+            
+            <div class="space-y-3 mb-6">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Subtotal:</span>
+                <span id="subtotalAmount" class="font-medium">KSh 0</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Delivery:</span>
+                <span id="deliveryAmount" class="font-medium text-teal-600">KSh 250</span>
+              </div>
+              <div class="border-t border-gray-200 pt-3">
+                <div class="flex justify-between text-lg font-bold">
+                  <span>Total:</span>
+                  <span id="totalAmount" class="text-teal-700">KSh 0</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Delivery Info Note -->
+            <div id="deliveryInfo" class="mb-4 p-3 bg-teal-50 border border-teal-100 rounded-lg text-sm text-teal-700">
+              <i class="fas fa-info-circle mr-2"></i>
+              <span>Free delivery for orders KSh 5,000 and above in select areas</span>
+            </div>
+            
+            <!-- Delivery Status Indicator -->
+            <div id="deliveryStatus" class="mb-6 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+              <div class="flex items-center gap-3 mb-2">
+                <div class="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
+                  <i class="fas fa-map-marker-alt text-xs text-white"></i>
+                </div>
+                <span class="font-medium text-gray-700">Delivery Details</span>
+              </div>
+              <p class="text-sm text-gray-500" id="deliveryStatusText">Add delivery information to proceed</p>
+              <button id="addDeliveryBtn" class="w-full mt-2 bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded-lg text-sm font-medium">
+                Add Delivery Details
+              </button>
+            </div>
+            
+            <!-- Payment Methods -->
+            <div class="mb-6">
+              <h3 class="font-bold text-gray-800 mb-3">Payment Method</h3>
+              <div class="space-y-3">
+                <label class="payment-method flex items-center gap-3 border border-gray-300 rounded-lg p-4 cursor-pointer">
+                  <input type="radio" name="payment" value="mpesa" checked class="text-teal-600">
+                  <div class="flex-1">
+                    <div class="font-medium">M-Pesa</div>
+                    <div class="text-sm text-gray-600">Pay via Safaricom M-Pesa</div>
+                  </div>
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/M-PESA_LOGO-01.svg/2560px-M-PESA_LOGO-01.svg.png" alt="M-Pesa" class="h-6">
+                </label>
+                <label class="payment-method flex items-center gap-3 border border-gray-300 rounded-lg p-4 cursor-pointer">
+                  <input type="radio" name="payment" value="card" class="text-teal-600">
+                  <div class="flex-1">
+                    <div class="font-medium">Credit/Debit Card</div>
+                    <div class="text-sm text-gray-600">Visa, Mastercard, etc.</div>
+                  </div>
+                  <div class="flex gap-1">
+                    <div class="bg-gray-800 text-white text-xs px-2 py-1 rounded">Visa</div>
+                    <div class="bg-red-600 text-white text-xs px-2 py-1 rounded">Mastercard</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Checkout Button -->
+            <button id="checkoutBtn" class="checkout-btn w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+              Proceed to Checkout
+            </button>
+            
+            <p class="text-xs text-gray-500 text-center mt-4">
+              You'll be redirected to complete your payment
+            </p>
+          </div>
+          
+          <!-- Need Help? -->
+          <div class="bg-teal-50 border border-teal-100 rounded-xl p-6">
+            <h3 class="text-lg font-bold text-teal-800 mb-2">Need Help?</h3>
+            <p class="text-teal-700 text-sm mb-4">Contact us for any questions about your order.</p>
+            <div class="space-y-2">
+              <a href="tel:+254700123456" class="flex items-center gap-2 text-teal-600 hover:text-teal-700">
+                <i class="fas fa-phone"></i> +254 700 123 456
+              </a>
+              <a href="mailto:hello@blanketsbaskets.co.ke" class="flex items-center gap-2 text-teal-600 hover:text-teal-700">
+                <i class="fas fa-envelope"></i> hello@blanketsbaskets.co.ke
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+   <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-12">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <!-- Company Info -->
+        <div>
+          <div class="text-2xl font-extrabold text-teal-400 mb-4">blankets &amp; baskets</div>
+          <p class="text-gray-300">Fresh picnic kits for memorable outdoor moments.</p>
+          <div class="flex gap-4 mt-4">
+            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook text-xl"></i></a>
+            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-instagram text-xl"></i></a>
+            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter text-xl"></i></a>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div>
+          <h4 class="text-lg font-bold mb-4">Quick Links</h4>
+          <ul class="space-y-2">
+            <li><a href="index.html" class="text-gray-300 hover:text-white">Home</a></li>
+            <li><a href="products.html" class="text-gray-300 hover:text-white">Products</a></li>
+            <li><a href="custom-basket.html" class="text-gray-300 hover:text-white">Custom Basket</a></li>
+            <li><a href="add-ons.html" class="text-gray-300 hover:text-white">Add-ons</a></li>
+            <li><a href="register.html" class="text-gray-300 hover:text-white">Register</a></li>
+            <li><a href="login.html" class="text-gray-300 hover:text-white">Login</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact -->
+        <div>
+          <h4 class="text-lg font-bold mb-4">Contact</h4>
+          <ul class="space-y-2 text-gray-300">
+            <li class="flex items-center gap-2"><i class="fas fa-phone"></i> +254 700 123 456</li>
+            <li class="flex items-center gap-2"><i class="fas fa-envelope"></i> hello@blanketsbaskets.co.ke</li>
+            <li class="flex items-center gap-2"><i class="fas fa-map-marker-alt"></i> Nairobi, Kenya</li>
+          </ul>
+        </div>
+
+        <!-- Payment Methods -->
+        <div>
+          <h4 class="text-lg font-bold mb-4">Payment Methods</h4>
+          <div class="flex flex-wrap gap-2">
+            <div class="bg-white text-gray-800 px-3 py-1 rounded text-sm font-medium">M-Pesa</div>
+            <div class="bg-white text-gray-800 px-3 py-1 rounded text-sm font-medium">Visa</div>
+            <div class="bg-white text-gray-800 px-3 py-1 rounded text-sm font-medium">Mastercard</div>
+          </div>
+          <p class="text-sm text-gray-400 mt-4">Secure payments guaranteed</p>
+          
+          <!-- Security Badges - Added -->
+          <div class="mt-4 flex flex-wrap gap-2">
+            <div class="bg-teal-600 text-white px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
+              <i class="fas fa-lock"></i>
+              <span>SSL Secured</span>
+            </div>
+            <div class="bg-teal-600 text-white px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
+              <i class="fas fa-shield-alt"></i>
+              <span>PCI DSS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legal & Compliance Section - Added -->
+      <div class="border-t border-gray-700 mt-8 pt-6">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="mb-4 md:mb-0">
+            <div class="flex flex-wrap gap-4 text-sm text-gray-400">
+              <a href="documents/Blankets_and_Baskets_Security_and_Privacy_Policy.pdf" class="hover:text-white">Privacy Policy</a>
+              <a href="#" class="hover:text-white">Terms of Service</a>
+              <a href="#" class="hover:text-white">Cookie Policy</a>
+              <a href="#" class="hover:text-white">Data Processing Agreement</a>
+              <a href="#" class="hover:text-white">Security Center</a>
+            </div>
+          </div>
+          
+          <!-- Security Compliance Badges - Added -->
+          <div class="flex flex-wrap gap-3">
+            <div class="flex items-center gap-1 text-sm text-gray-400">
+              <i class="fas fa-user-shield text-teal-400"></i>
+              <span>GDPR Ready</span>
+            </div>
+            <div class="flex items-center gap-1 text-sm text-gray-400">
+              <i class="fas fa-check-circle text-teal-400"></i>
+              <span>ISO 27001</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-700 mt-6 pt-8 text-center text-gray-400">
+        <p>&copy; 2025 Blankets &amp; Baskets. All rights reserved.</p>
+        <p class="text-sm mt-2">Demo static mockup. M-Pesa integration via Safaricom Daraja API.</p>
+        
+        <!-- E-commerce Security Notice - Added -->
+        <div class="mt-4 text-xs text-gray-500 max-w-2xl mx-auto">
+          <p>This e-commerce platform implements six key dimensions of security: <span class="text-teal-300">Integrity</span>, <span class="text-teal-300">Non-repudiation</span>, <span class="text-teal-300">Authenticity</span>, <span class="text-teal-300">Confidentiality</span>, <span class="text-teal-300">Privacy</span>, and <span class="text-teal-300">Availability</span>.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Payment Modal -->
+  <div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-lg max-w-md w-full">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold text-gray-800">Complete Payment</h3>
+          <button id="closePaymentModal" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <div id="paymentContent">
+          <!-- Payment content will be dynamically loaded -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Cart Management
+    const CART_KEY = 'bb_cart_v2';
+    const DELIVERY_KEY = 'bb_delivery_info';
+    
+    // Delivery price mapping based on area
+    const DELIVERY_PRICES = {
+      'nairobi-cbd': 250,
+      'westlands': 250,
+      'kileleshwa': 250,
+      'kilimani': 250,
+      'lavington': 250,
+      'karen': 300,
+      'rongai': 350,
+      'ruaka': 270,
+      'other': 0 // Contact for quote
+    };
+    
+    // Free delivery threshold
+    const FREE_DELIVERY_THRESHOLD = 5000;
+    
+    function loadCart() {
+      try {
+        const cart = localStorage.getItem(CART_KEY);
+        return cart ? JSON.parse(cart) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+    
+    function saveCart(cart) {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+      updateCartCount();
+      renderCartItems();
+      updateOrderSummary();
+    }
+    
+    function updateCartCount() {
+      const cart = loadCart();
+      const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+      const cartCount = document.getElementById('cartCount');
+      if (cartCount) {
+        cartCount.textContent = total;
+        if (total > 0) {
+          cartCount.classList.remove('hidden');
+        } else {
+          cartCount.classList.add('hidden');
+        }
+      }
+    }
+    
+    // Render cart items
+    function renderCartItems() {
+      const container = document.getElementById('cartItemsContainer');
+      const cart = loadCart();
+      
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12">
+            <i class="fas fa-shopping-cart text-4xl text-gray-300 mb-4"></i>
+            <p class="text-gray-500">Your cart is empty</p>
+            <a href="products.html" class="inline-block mt-4 text-teal-600 hover:text-teal-700 font-medium">
+              Continue Shopping
+            </a>
+          </div>
+        `;
+        document.getElementById('checkoutBtn').disabled = true;
+        document.getElementById('deliverySection').style.display = 'none';
+        return;
+      }
+      
+      // Enable checkout button only if delivery info exists
+      const deliveryInfo = loadDeliveryInfo();
+      document.getElementById('checkoutBtn').disabled = !deliveryInfo;
+      document.getElementById('deliverySection').style.display = 'block';
+      
+      container.innerHTML = cart.map((item, index) => `
+        <div class="cart-item border-b border-gray-200 pb-6 mb-6 last:border-0 last:mb-0 last:pb-0">
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <h4 class="font-bold text-gray-800 mb-1">${item.name}</h4>
+              ${item.type === 'custom' ? `
+                <div class="text-sm text-gray-600 mb-2">
+                  ${item.items ? item.items.map(i => `${i.quantity}x ${i.name}`).join(', ') : 'Custom items'}
+                </div>
+              ` : ''}
+              <div class="text-lg font-bold text-teal-700">KSh ${(item.price * item.quantity).toLocaleString()}</div>
+            </div>
+            <div class="flex items-center gap-4">
+              <!-- Quantity Controls -->
+              <div class="flex items-center gap-2">
+                <button class="quantity-btn w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center" data-index="${index}" data-action="decrease">
+                  <i class="fas fa-minus text-sm"></i>
+                </button>
+                <span class="w-8 text-center font-medium">${item.quantity}</span>
+                <button class="quantity-btn w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center" data-index="${index}" data-action="increase">
+                  <i class="fas fa-plus text-sm"></i>
+                </button>
+              </div>
+              <!-- Remove Button -->
+              <button class="remove-btn text-gray-500 hover:text-red-600" data-index="${index}">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      
+      // Add event listeners
+      document.querySelectorAll('.quantity-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+          const index = parseInt(e.currentTarget.dataset.index);
+          const action = e.currentTarget.dataset.action;
+          updateCartItemQuantity(index, action);
+        });
+      });
+      
+      document.querySelectorAll('.remove-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+          const index = parseInt(e.currentTarget.dataset.index);
+          removeCartItem(index);
+        });
+      });
+    }
+    
+    // Update cart item quantity
+    function updateCartItemQuantity(index, action) {
+      const cart = loadCart();
+      if (index < 0 || index >= cart.length) return;
+      
+      if (action === 'increase') {
+        cart[index].quantity += 1;
+      } else if (action === 'decrease') {
+        if (cart[index].quantity > 1) {
+          cart[index].quantity -= 1;
+        } else {
+          // Remove item if quantity becomes 0
+          cart.splice(index, 1);
+        }
+      }
+      
+      saveCart(cart);
+    }
+    
+    // Remove cart item
+    function removeCartItem(index) {
+      const cart = loadCart();
+      if (index < 0 || index >= cart.length) return;
+      
+      if (confirm('Remove this item from your cart?')) {
+        cart.splice(index, 1);
+        saveCart(cart);
+      }
+    }
+    
+    // Clear cart
+    function clearCart() {
+      if (confirm('Are you sure you want to clear your cart?')) {
+        localStorage.removeItem(CART_KEY);
+        updateCartCount();
+        renderCartItems();
+        updateOrderSummary();
+        updateDeliveryStatus();
+      }
+    }
+    
+    // Calculate delivery fee based on area and subtotal
+    function calculateDeliveryFee(area, subtotal) {
+      if (!area || area === '') return 250; // Default KSh 250
+      
+      const baseFee = DELIVERY_PRICES[area] || 250;
+      
+      // Check if free delivery applies (only for orders above threshold in certain areas)
+      if (subtotal >= FREE_DELIVERY_THRESHOLD) {
+        // Free delivery applies only to these areas
+        if (['nairobi-cbd', 'westlands', 'kileleshwa', 'kilimani', 'lavington'].includes(area)) {
+          return 0; // Free for these areas
+        } else if (area === 'other') {
+          return 0; // Contact for quote
+        }
+        // Other areas keep their base fee even with high subtotal
+        return baseFee;
+      }
+      
+      return baseFee;
+    }
+    
+    // Update order summary with dynamic delivery calculation
+    function updateOrderSummary() {
+      const cart = loadCart();
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      
+      // Get current delivery area from saved info OR from the form
+      const deliveryInfo = loadDeliveryInfo();
+      const currentArea = deliveryInfo ? deliveryInfo.area : (document.getElementById('deliveryArea')?.value || '');
+      const deliveryFee = calculateDeliveryFee(currentArea, subtotal);
+      
+      const total = subtotal + deliveryFee;
+      
+      // Update subtotal
+      document.getElementById('subtotalAmount').textContent = `KSh ${subtotal.toLocaleString()}`;
+      
+      // Update delivery
+      const deliveryElement = document.getElementById('deliveryAmount');
+      if (deliveryElement) {
+        if (deliveryFee === 0) {
+          if (currentArea === 'other') {
+            deliveryElement.textContent = 'Contact for quote';
+            deliveryElement.className = 'font-medium text-blue-600';
+          } else if (subtotal >= FREE_DELIVERY_THRESHOLD) {
+            deliveryElement.textContent = 'Free';
+            deliveryElement.className = 'font-medium text-green-600';
+          } else {
+            deliveryElement.textContent = 'Free';
+            deliveryElement.className = 'font-medium text-teal-600';
+          }
+        } else {
+          deliveryElement.textContent = `KSh ${deliveryFee}`;
+          deliveryElement.className = 'font-medium text-gray-800';
+        }
+      }
+      
+      // Update total
+      document.getElementById('totalAmount').textContent = `KSh ${total.toLocaleString()}`;
+      
+      // Update delivery info message
+      const deliveryInfoElement = document.getElementById('deliveryInfo');
+      if (deliveryInfoElement) {
+        if (deliveryFee === 0 && subtotal >= FREE_DELIVERY_THRESHOLD) {
+          deliveryInfoElement.innerHTML = '<i class="fas fa-check-circle mr-2"></i><span>Congratulations! You qualify for free delivery</span>';
+          deliveryInfoElement.className = 'mb-4 p-3 bg-green-50 border border-green-100 rounded-lg text-sm text-green-700';
+        } else if (deliveryFee === 0 && currentArea === 'other') {
+          deliveryInfoElement.innerHTML = '<i class="fas fa-info-circle mr-2"></i><span>We\'ll contact you for a delivery quote</span>';
+          deliveryInfoElement.className = 'mb-4 p-3 bg-blue-50 border border-blue-100 rounded-lg text-sm text-blue-700';
+        } else {
+          const amountNeeded = FREE_DELIVERY_THRESHOLD - subtotal;
+          if (amountNeeded > 0) {
+            deliveryInfoElement.innerHTML = `<i class="fas fa-info-circle mr-2"></i><span>Add KSh ${amountNeeded.toLocaleString()} more to qualify for free delivery</span>`;
+            deliveryInfoElement.className = 'mb-4 p-3 bg-teal-50 border border-teal-100 rounded-lg text-sm text-teal-700';
+          } else {
+            deliveryInfoElement.innerHTML = '<i class="fas fa-info-circle mr-2"></i><span>Free delivery for orders KSh 5,000 and above in select areas</span>';
+            deliveryInfoElement.className = 'mb-4 p-3 bg-teal-50 border border-teal-100 rounded-lg text-sm text-teal-700';
+          }
+        }
+      }
+      
+      // Update checkout button state
+      const checkoutBtn = document.getElementById('checkoutBtn');
+      if (deliveryInfo && cart.length > 0) {
+        checkoutBtn.disabled = false;
+        checkoutBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      } else {
+        checkoutBtn.disabled = true;
+        checkoutBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+    }
+    
+    // Delivery Information Management
+    function loadDeliveryInfo() {
+      try {
+        const delivery = localStorage.getItem(DELIVERY_KEY);
+        return delivery ? JSON.parse(delivery) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+    
+    function saveDeliveryInfo(deliveryInfo) {
+      localStorage.setItem(DELIVERY_KEY, JSON.stringify(deliveryInfo));
+    }
+    
+    function updateDeliveryStatus() {
+      const deliveryInfo = loadDeliveryInfo();
+      const statusElement = document.getElementById('deliveryStatus');
+      const checkoutBtn = document.getElementById('checkoutBtn');
+      const cart = loadCart();
+      
+      if (deliveryInfo && cart.length > 0) {
+        // Format the area name for display
+        const areaDisplayNames = {
+          'nairobi-cbd': 'Nairobi CBD',
+          'westlands': 'Westlands',
+          'kileleshwa': 'Kileleshwa',
+          'kilimani': 'Kilimani',
+          'lavington': 'Lavington',
+          'karen': 'Karen',
+          'rongai': 'Rongai',
+          'ruaka': 'Ruaka',
+          'other': 'Other Areas'
+        };
+        
+        const displayArea = areaDisplayNames[deliveryInfo.area] || deliveryInfo.area;
+        
+        // Calculate delivery fee for status display
+        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const deliveryFee = calculateDeliveryFee(deliveryInfo.area, subtotal);
+        
+        // Update status indicator
+        statusElement.innerHTML = `
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+              <i class="fas fa-check text-xs text-white"></i>
+            </div>
+            <span class="font-medium text-gray-700">Delivery Details ✓</span>
+          </div>
+          <p class="text-sm text-gray-500 mb-1">Delivering to: ${displayArea}</p>
+          <p class="text-sm text-gray-500 mb-1">Delivery Fee: ${deliveryFee === 0 ? (deliveryInfo.area === 'other' ? 'Contact for quote' : 'Free') : 'KSh ' + deliveryFee}</p>
+          <p class="text-sm text-gray-500 mb-3">Date: ${deliveryInfo.date}, Time: ${deliveryInfo.time}</p>
+          <button id="editDeliveryBtn2" class="w-full mt-2 border border-teal-600 text-teal-600 hover:bg-teal-50 py-2 rounded-lg text-sm font-medium">
+            Edit Delivery Details
+          </button>
+        `;
+        
+        // Update delivery summary at the top
+        document.getElementById('deliverySummary').style.display = 'block';
+        document.getElementById('summaryName').textContent = `Name: ${deliveryInfo.name}`;
+        document.getElementById('summaryPhone').textContent = `Phone: ${deliveryInfo.phone}`;
+        document.getElementById('summaryAddress').textContent = `Address: ${deliveryInfo.address}${deliveryInfo.building ? ', ' + deliveryInfo.building : ''}${deliveryInfo.apartment ? ', ' + deliveryInfo.apartment : ''}`;
+        document.getElementById('summaryArea').textContent = `Area: ${displayArea}`;
+        document.getElementById('summaryDateTime').textContent = `Date & Time: ${deliveryInfo.date} • ${deliveryInfo.time}`;
+        if (deliveryInfo.instructions) {
+          document.getElementById('summaryInstructions').textContent = `Instructions: ${deliveryInfo.instructions}`;
+        }
+        
+        // Hide form, show edit button
+        document.getElementById('saveDeliveryBtn').style.display = 'none';
+        document.getElementById('editDeliveryBtn').style.display = 'block';
+        
+        // Enable checkout button
+        checkoutBtn.disabled = false;
+        checkoutBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        
+      } else {
+        // Reset to default state
+        const addBtn = document.getElementById('addDeliveryBtn');
+        
+        if (cart.length > 0) {
+          statusElement.innerHTML = `
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
+                <i class="fas fa-map-marker-alt text-xs text-white"></i>
+              </div>
+              <span class="font-medium text-gray-700">Delivery Details</span>
+            </div>
+            <p class="text-sm text-gray-500" id="deliveryStatusText">Add delivery information to proceed</p>
+            <button id="addDeliveryBtn" class="w-full mt-2 bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded-lg text-sm font-medium">
+              Add Delivery Details
+            </button>
+          `;
+        } else {
+          statusElement.innerHTML = `
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
+                <i class="fas fa-shopping-cart text-xs text-white"></i>
+              </div>
+              <span class="font-medium text-gray-700">Cart Empty</span>
+            </div>
+            <p class="text-sm text-gray-500" id="deliveryStatusText">Add items to cart first</p>
+            <button id="addDeliveryBtn" class="w-full mt-2 bg-teal-600 hover:bg-teal-700 text-white py-2 rounded-lg text-sm font-medium">
+              Browse Products
+            </button>
+          `;
+        }
+        
+        document.getElementById('deliverySummary').style.display = 'none';
+        document.getElementById('saveDeliveryBtn').style.display = 'block';
+        document.getElementById('editDeliveryBtn').style.display = 'none';
+        
+        // Disable checkout button
+        checkoutBtn.disabled = true;
+        checkoutBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+    }
+    
+    function showDeliveryForm() {
+      // Show the form
+      document.getElementById('deliverySection').style.display = 'block';
+      document.getElementById('saveDeliveryBtn').style.display = 'block';
+      document.getElementById('editDeliveryBtn').style.display = 'none';
+      document.getElementById('deliverySummary').style.display = 'none';
+      
+      // Load saved data if exists
+      const savedInfo = loadDeliveryInfo();
+      if (savedInfo) {
+        document.getElementById('deliveryName').value = savedInfo.name || '';
+        document.getElementById('deliveryPhone').value = savedInfo.phone || '';
+        document.getElementById('deliveryArea').value = savedInfo.area || '';
+        document.getElementById('deliveryAddress').value = savedInfo.address || '';
+        document.getElementById('buildingName').value = savedInfo.building || '';
+        document.getElementById('apartmentNumber').value = savedInfo.apartment || '';
+        document.getElementById('deliveryInstructions').value = savedInfo.instructions || '';
+        document.getElementById('deliveryDate').value = savedInfo.date || '';
+        document.getElementById('deliveryTime').value = savedInfo.time || '';
+        document.getElementById('saveDeliveryInfo').checked = savedInfo.save || false;
+      }
+    }
+    
+    function validateDeliveryForm() {
+      let isValid = true;
+      
+      // Clear previous errors
+      document.querySelectorAll('.validation-error').forEach(el => {
+        el.classList.remove('validation-error');
+      });
+      document.querySelectorAll('[id$="Error"]').forEach(el => {
+        el.classList.add('hidden');
+      });
+      
+      // Validate name
+      const name = document.getElementById('deliveryName').value.trim();
+      if (!name) {
+        document.getElementById('deliveryName').classList.add('validation-error');
+        document.getElementById('nameError').classList.remove('hidden');
+        isValid = false;
+      }
+      
+      // Validate phone
+      const phone = document.getElementById('deliveryPhone').value.trim();
+      const phoneRegex = /^07\d{8}$/;
+      if (!phone || !phoneRegex.test(phone)) {
+        document.getElementById('deliveryPhone').classList.add('validation-error');
+        document.getElementById('phoneError').classList.remove('hidden');
+        isValid = false;
+      }
+      
+      // Validate area
+      const area = document.getElementById('deliveryArea').value;
+      if (!area) {
+        document.getElementById('deliveryArea').classList.add('validation-error');
+        document.getElementById('areaError').classList.remove('hidden');
+        isValid = false;
+      }
+      
+      // Validate address
+      const address = document.getElementById('deliveryAddress').value.trim();
+      if (!address) {
+        document.getElementById('deliveryAddress').classList.add('validation-error');
+        document.getElementById('addressError').classList.remove('hidden');
+        isValid = false;
+      }
+      
+      // Validate date
+      const date = document.getElementById('deliveryDate').value;
+      if (!date) {
+        document.getElementById('deliveryDate').classList.add('validation-error');
+        document.getElementById('dateError').classList.remove('hidden');
+        isValid = false;
+      }
+      
+      // Validate time
+      const time = document.getElementById('deliveryTime').value;
+      if (!time) {
+        document.getElementById('deliveryTime').classList.add('validation-error');
+        document.getElementById('timeError').classList.remove('hidden');
+        isValid = false;
+      }
+      
+      return isValid;
+    }
+    
+    function saveDeliveryDetails() {
+      if (!validateDeliveryForm()) {
+        return;
+      }
+      
+      const deliveryInfo = {
+        name: document.getElementById('deliveryName').value.trim(),
+        phone: document.getElementById('deliveryPhone').value.trim(),
+        area: document.getElementById('deliveryArea').value,
+        address: document.getElementById('deliveryAddress').value.trim(),
+        building: document.getElementById('buildingName').value.trim(),
+        apartment: document.getElementById('apartmentNumber').value.trim(),
+        instructions: document.getElementById('deliveryInstructions').value.trim(),
+        date: document.getElementById('deliveryDate').value,
+        time: document.getElementById('deliveryTime').value,
+        save: document.getElementById('saveDeliveryInfo').checked,
+        timestamp: new Date().toISOString()
+      };
+      
+      saveDeliveryInfo(deliveryInfo);
+      
+      // CRITICAL FIX: Update both the status and order summary
+      updateDeliveryStatus();
+      updateOrderSummary();
+      
+      // Show success message
+      const saveBtn = document.getElementById('saveDeliveryBtn');
+      const originalText = saveBtn.textContent;
+      saveBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Details Saved!';
+      saveBtn.classList.remove('bg-teal-600', 'hover:bg-teal-700');
+      saveBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+      
+      setTimeout(() => {
+        saveBtn.textContent = originalText;
+        saveBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+        saveBtn.classList.add('bg-teal-600', 'hover:bg-teal-700');
+      }, 2000);
+    }
+    
+    // Checkout process
+    function checkout() {
+      const cart = loadCart();
+      if (cart.length === 0) return;
+      
+      const deliveryInfo = loadDeliveryInfo();
+      if (!deliveryInfo) {
+        alert('Please add delivery information before checkout');
+        showDeliveryForm();
+        return;
+      }
+      
+      const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+      
+      if (paymentMethod === 'mpesa') {
+        showMpesaPayment();
+      } else {
+        showCardPayment();
+      }
+    }
+    
+    // Show M-Pesa payment
+    function showMpesaPayment() {
+      const modal = document.getElementById('paymentModal');
+      const content = document.getElementById('paymentContent');
+      
+      // Calculate totals
+      const cart = loadCart();
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const deliveryInfo = loadDeliveryInfo();
+      
+      // Get delivery fee
+      const deliveryFee = calculateDeliveryFee(deliveryInfo.area, subtotal);
+      const total = subtotal + deliveryFee;
+      
+      // Format area for display
+      const areaDisplayNames = {
+        'nairobi-cbd': 'Nairobi CBD',
+        'westlands': 'Westlands',
+        'kileleshwa': 'Kileleshwa',
+        'kilimani': 'Kilimani',
+        'lavington': 'Lavington',
+        'karen': 'Karen',
+        'rongai': 'Rongai',
+        'ruaka': 'Ruaka',
+        'other': 'Other Areas'
+      };
+      
+      const displayArea = areaDisplayNames[deliveryInfo.area] || deliveryInfo.area;
+      
+      content.innerHTML = `
+        <div class="text-center">
+          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-mobile-alt text-2xl text-green-600"></i>
+          </div>
+          <h4 class="text-lg font-bold text-gray-800 mb-2">Pay with M-Pesa</h4>
+          <p class="text-gray-600 mb-6">You'll receive a payment request on your phone.</p>
+          
+          <!-- Delivery Summary -->
+          <div class="bg-gray-50 rounded-lg p-4 mb-4">
+            <h5 class="font-medium text-gray-800 mb-2">Delivery Summary</h5>
+            <div class="text-sm text-gray-600 text-left space-y-1">
+              <div><span class="font-medium">To:</span> ${deliveryInfo.name}</div>
+              <div><span class="font-medium">Phone:</span> ${deliveryInfo.phone}</div>
+              <div><span class="font-medium">Area:</span> ${displayArea}</div>
+              <div><span class="font-medium">Date:</span> ${deliveryInfo.date}</div>
+              <div><span class="font-medium">Time:</span> ${deliveryInfo.time}</div>
+            </div>
+          </div>
+          
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">M-Pesa Phone Number</label>
+            <input type="tel" id="mpesaPhone" class="w-full border border-gray-300 rounded-lg p-3" placeholder="07XXXXXXXX" maxlength="10" value="${deliveryInfo.phone}">
+          </div>
+          
+          <div class="bg-gray-50 rounded-lg p-4 mb-6">
+            <div class="flex justify-between mb-2">
+              <span class="text-gray-600">Order Total:</span>
+              <span class="font-bold">KSh ${subtotal.toLocaleString()}</span>
+            </div>
+            <div class="flex justify-between mb-2">
+              <span class="text-gray-600">Delivery:</span>
+              <span class="font-bold">${deliveryFee === 0 ? (deliveryInfo.area === 'other' ? 'Contact for quote' : 'Free') : 'KSh ' + deliveryFee}</span>
+            </div>
+            <div class="flex justify-between mt-2 pt-2 border-t border-gray-200">
+              <span class="text-gray-800 font-bold">Amount to pay:</span>
+              <span class="font-bold text-lg" id="paymentAmount">${deliveryFee === 0 && deliveryInfo.area === 'other' ? 'Contact for quote' : 'KSh ' + total.toLocaleString()}</span>
+            </div>
+            <div class="text-sm text-gray-500 mt-2">Check your phone for the STK Push prompt</div>
+          </div>
+          
+          <div class="flex gap-3">
+            <button id="cancelPayment" class="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium">
+              Cancel
+            </button>
+            <button id="confirmMpesaPayment" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium" ${deliveryFee === 0 && deliveryInfo.area === 'other' ? 'disabled' : ''}>
+              ${deliveryFee === 0 && deliveryInfo.area === 'other' ? 'Contact for Quote' : 'Pay Now'}
+            </button>
+          </div>
+        </div>
+      `;
+      
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      
+      // Add event listeners
+      document.getElementById('cancelPayment').addEventListener('click', closePaymentModal);
+      if (!(deliveryFee === 0 && deliveryInfo.area === 'other')) {
+        document.getElementById('confirmMpesaPayment').addEventListener('click', processMpesaPayment);
+      }
+    }
+    
+    // Process M-Pesa payment
+    function processMpesaPayment() {
+      const phone = document.getElementById('mpesaPhone').value;
+      
+      if (!phone || !/^07\d{8}$/.test(phone)) {
+        alert('Please enter a valid Safaricom phone number (e.g., 0712345678)');
+        return;
+      }
+      
+      // Calculate totals
+      const cart = loadCart();
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const deliveryInfo = loadDeliveryInfo();
+      
+      // Get delivery fee
+      const deliveryFee = calculateDeliveryFee(deliveryInfo.area, subtotal);
+      const total = subtotal + deliveryFee;
+      
+      // Simulate payment processing
+      document.getElementById('paymentContent').innerHTML = `
+        <div class="text-center py-8">
+          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <i class="fas fa-spinner fa-spin text-2xl text-green-600"></i>
+          </div>
+          <h4 class="text-lg font-bold text-gray-800 mb-2">Processing Payment</h4>
+          <p class="text-gray-600 mb-4">Please check your phone for the STK Push prompt.</p>
+          <div class="bg-gray-50 rounded-lg p-4 mb-4">
+            <div class="flex justify-between mb-1">
+              <span class="text-gray-600">Amount:</span>
+              <span class="font-bold">KSh ${total.toLocaleString()}</span>
+            </div>
+            <div class="flex justify-between mb-1">
+              <span class="text-gray-600">Phone:</span>
+              <span class="font-bold">${phone}</span>
+            </div>
+            <div class="flex justify-between mt-2 pt-2 border-t border-gray-200">
+              <span class="text-gray-800">Delivery to:</span>
+              <span class="font-medium">${deliveryInfo.area}</span>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Simulate successful payment after 3 seconds
+      setTimeout(() => {
+        document.getElementById('paymentContent').innerHTML = `
+          <div class="text-center py-8">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-check text-2xl text-green-600"></i>
+            </div>
+            <h4 class="text-lg font-bold text-gray-800 mb-2">Payment Successful!</h4>
+            <p class="text-gray-600 mb-6">Your order has been confirmed. Thank you!</p>
+            <div class="bg-gray-50 rounded-lg p-4 mb-6">
+              <div class="text-sm text-gray-600">Order Reference:</div>
+              <div class="font-mono font-bold">BB-${Date.now().toString().slice(-6)}</div>
+              <div class="text-sm text-gray-600 mt-2">Delivery: ${deliveryFee === 0 ? (deliveryInfo.area === 'other' ? 'Contact for quote' : 'Free') : 'KSh ' + deliveryFee}</div>
+              <div class="text-sm text-gray-600">Delivery Date: ${deliveryInfo.date} ${deliveryInfo.time}</div>
+              <div class="text-sm text-gray-600">Total Paid: KSh ${total.toLocaleString()}</div>
+            </div>
+            <button id="closeSuccess" class="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-medium">
+              Continue Shopping
+            </button>
+          </div>
+        `;
+        
+        // Clear cart on successful payment
+        localStorage.removeItem(CART_KEY);
+        localStorage.removeItem(DELIVERY_KEY);
+        updateCartCount();
+        updateDeliveryStatus();
+        
+        document.getElementById('closeSuccess').addEventListener('click', () => {
+          closePaymentModal();
+          window.location.href = 'index.html';
+        });
+      }, 3000);
+    }
+    
+    // Show card payment
+    function showCardPayment() {
+      const modal = document.getElementById('paymentModal');
+      const content = document.getElementById('paymentContent');
+      
+      // Calculate totals
+      const cart = loadCart();
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const deliveryInfo = loadDeliveryInfo();
+      
+      // Get delivery fee
+      const deliveryFee = calculateDeliveryFee(deliveryInfo.area, subtotal);
+      const total = subtotal + deliveryFee;
+      
+      // Format area for display
+      const areaDisplayNames = {
+        'nairobi-cbd': 'Nairobi CBD',
+        'westlands': 'Westlands',
+        'kileleshwa': 'Kileleshwa',
+        'kilimani': 'Kilimani',
+        'lavington': 'Lavington',
+        'karen': 'Karen',
+        'rongai': 'Rongai',
+        'ruaka': 'Ruaka',
+        'other': 'Other Areas'
+      };
+      
+      const displayArea = areaDisplayNames[deliveryInfo.area] || deliveryInfo.area;
+      
+      content.innerHTML = `
+        <div class="text-center">
+          <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-credit-card text-2xl text-blue-600"></i>
+          </div>
+          <h4 class="text-lg font-bold text-gray-800 mb-2">Pay with Card</h4>
+          <p class="text-gray-600 mb-6">Enter your card details securely.</p>
+          
+          <!-- Delivery Summary -->
+          <div class="bg-gray-50 rounded-lg p-4 mb-4">
+            <h5 class="font-medium text-gray-800 mb-2">Delivery Summary</h5>
+            <div class="text-sm text-gray-600 text-left space-y-1">
+              <div><span class="font-medium">To:</span> ${deliveryInfo.name}</div>
+              <div><span class="font-medium">Phone:</span> ${deliveryInfo.phone}</div>
+              <div><span class="font-medium">Area:</span> ${displayArea}</div>
+              <div><span class="font-medium">Date:</span> ${deliveryInfo.date}</div>
+              <div><span class="font-medium">Time:</span> ${deliveryInfo.time}</div>
+            </div>
+          </div>
+          
+          <div class="space-y-4 mb-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Card Number</label>
+              <input type="text" id="cardNumber" class="w-full border border-gray-300 rounded-lg p-3" placeholder="1234 5678 9012 3456" maxlength="19">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Expiry Date</label>
+                <input type="text" id="cardExpiry" class="w-full border border-gray-300 rounded-lg p-3" placeholder="MM/YY">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">CVC</label>
+                <input type="text" id="cardCvc" class="w-full border border-gray-300 rounded-lg p-3" placeholder="123" maxlength="3">
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Cardholder Name</label>
+              <input type="text" id="cardName" class="w-full border border-gray-300 rounded-lg p-3" placeholder="John Doe">
+            </div>
+          </div>
+          
+          <div class="bg-gray-50 rounded-lg p-4 mb-6">
+            <div class="flex justify-between mb-2">
+              <span class="text-gray-600">Order Total:</span>
+              <span class="font-bold">KSh ${subtotal.toLocaleString()}</span>
+            </div>
+            <div class="flex justify-between mb-2">
+              <span class="text-gray-600">Delivery:</span>
+              <span class="font-bold">${deliveryFee === 0 ? (deliveryInfo.area === 'other' ? 'Contact for quote' : 'Free') : 'KSh ' + deliveryFee}</span>
+            </div>
+            <div class="flex justify-between mt-2 pt-2 border-t border-gray-200">
+              <span class="text-gray-800 font-bold">Amount to pay:</span>
+              <span class="font-bold text-lg" id="cardPaymentAmount">${deliveryFee === 0 && deliveryInfo.area === 'other' ? 'Contact for quote' : 'KSh ' + total.toLocaleString()}</span>
+            </div>
+            <div class="text-sm text-gray-500 mt-2">Secure payment processing</div>
+          </div>
+          
+          <div class="flex gap-3">
+            <button id="cancelCardPayment" class="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium">
+              Cancel
+            </button>
+            <button id="confirmCardPayment" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium" ${deliveryFee === 0 && deliveryInfo.area === 'other' ? 'disabled' : ''}>
+              ${deliveryFee === 0 && deliveryInfo.area === 'other' ? 'Contact for Quote' : 'Pay Now'}
+            </button>
+          </div>
+        </div>
+      `;
+      
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      
+      // Add event listeners
+      document.getElementById('cancelCardPayment').addEventListener('click', closePaymentModal);
+      if (!(deliveryFee === 0 && deliveryInfo.area === 'other')) {
+        document.getElementById('confirmCardPayment').addEventListener('click', processCardPayment);
+      }
+    }
+    
+    // Process card payment
+    function processCardPayment() {
+      const cardNumber = document.getElementById('cardNumber').value;
+      const cardExpiry = document.getElementById('cardExpiry').value;
+      const cardCvc = document.getElementById('cardCvc').value;
+      const cardName = document.getElementById('cardName').value;
+      
+      if (!cardNumber || !cardExpiry || !cardCvc || !cardName) {
+        alert('Please fill in all card details');
+        return;
+      }
+      
+      // Calculate totals
+      const cart = loadCart();
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const deliveryInfo = loadDeliveryInfo();
+      
+      // Get delivery fee
+      const deliveryFee = calculateDeliveryFee(deliveryInfo.area, subtotal);
+      const total = subtotal + deliveryFee;
+      
+      // Simulate payment processing
+      document.getElementById('paymentContent').innerHTML = `
+        <div class="text-center py-8">
+          <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <i class="fas fa-spinner fa-spin text-2xl text-blue-600"></i>
+          </div>
+          <h4 class="text-lg font-bold text-gray-800 mb-2">Processing Payment</h4>
+          <p class="text-gray-600 mb-4">Please wait while we process your payment.</p>
+          <div class="bg-gray-50 rounded-lg p-4 mb-4">
+            <div class="flex justify-between mb-1">
+              <span class="text-gray-600">Amount:</span>
+              <span class="font-bold">KSh ${total.toLocaleString()}</span>
+            </div>
+            <div class="flex justify-between mt-2 pt-2 border-t border-gray-200">
+              <span class="text-gray-800">Delivery to:</span>
+              <span class="font-medium">${deliveryInfo.area}</span>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Simulate successful payment after 3 seconds
+      setTimeout(() => {
+        document.getElementById('paymentContent').innerHTML = `
+          <div class="text-center py-8">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-check text-2xl text-blue-600"></i>
+            </div>
+            <h4 class="text-lg font-bold text-gray-800 mb-2">Payment Successful!</h4>
+            <p class="text-gray-600 mb-6">Your order has been confirmed. Thank you!</p>
+            <div class="bg-gray-50 rounded-lg p-4 mb-6">
+              <div class="text-sm text-gray-600">Order Reference:</div>
+              <div class="font-mono font-bold">BB-${Date.now().toString().slice(-6)}</div>
+              <div class="text-sm text-gray-600 mt-2">Delivery: ${deliveryFee === 0 ? (deliveryInfo.area === 'other' ? 'Contact for quote' : 'Free') : 'KSh ' + deliveryFee}</div>
+              <div class="text-sm text-gray-600">Delivery Date: ${deliveryInfo.date} ${deliveryInfo.time}</div>
+              <div class="text-sm text-gray-600">Total Paid: KSh ${total.toLocaleString()}</div>
+            </div>
+            <button id="closeCardSuccess" class="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-medium">
+              Continue Shopping
+            </button>
+          </div>
+        `;
+        
+        // Clear cart on successful payment
+        localStorage.removeItem(CART_KEY);
+        localStorage.removeItem(DELIVERY_KEY);
+        updateCartCount();
+        updateDeliveryStatus();
+        
+        document.getElementById('closeCardSuccess').addEventListener('click', () => {
+          closePaymentModal();
+          window.location.href = 'index.html';
+        });
+      }, 3000);
+    }
+    
+    // Close payment modal
+    function closePaymentModal() {
+      document.getElementById('paymentModal').classList.add('hidden');
+      document.getElementById('paymentModal').classList.remove('flex');
+    }
+    
+    // Mobile Menu
+    document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.add('open');
+    });
+    
+    document.getElementById('closeMobileMenu')?.addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.remove('open');
+    });
+    
+    // Close payment modal
+    document.getElementById('closePaymentModal')?.addEventListener('click', closePaymentModal);
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      updateCartCount();
+      renderCartItems();
+      updateOrderSummary();
+      updateDeliveryStatus();
+      
+      // Highlight current page in nav
+      const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+      document.querySelectorAll('.nav-link').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href === currentPage) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+      
+      // Event listeners
+      document.getElementById('clearCartBtn').addEventListener('click', clearCart);
+      document.getElementById('checkoutBtn').addEventListener('click', checkout);
+      document.getElementById('saveDeliveryBtn').addEventListener('click', saveDeliveryDetails);
+      document.getElementById('editDeliveryBtn').addEventListener('click', showDeliveryForm);
+      document.getElementById('editSummaryBtn')?.addEventListener('click', showDeliveryForm);
+      
+      // Set minimum date to today
+      const today = new Date().toISOString().split('T')[0];
+      const dateInput = document.getElementById('deliveryDate');
+      if (dateInput) {
+        dateInput.min = today;
+        // Set default to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        dateInput.value = tomorrow.toISOString().split('T')[0];
+      }
+      
+      // Auto-update delivery fee when area changes (real-time)
+      const areaSelect = document.getElementById('deliveryArea');
+      if (areaSelect) {
+        areaSelect.addEventListener('change', () => {
+          updateOrderSummary();
+        });
+      }
+      
+      // Event delegation for dynamically created buttons
+      document.addEventListener('click', (e) => {
+        // Handle add delivery button
+        if (e.target.id === 'addDeliveryBtn' || e.target.closest('#addDeliveryBtn')) {
+          showDeliveryForm();
+        }
+        
+        // Handle edit delivery button in status
+        if (e.target.id === 'editDeliveryBtn2' || e.target.closest('#editDeliveryBtn2')) {
+          showDeliveryForm();
+        }
+      });
+      
+      // Close mobile menu when clicking outside
+      document.addEventListener('click', (e) => {
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuBtn = document.getElementById('mobileMenuBtn');
+        
+        if (mobileMenu.classList.contains('open') && 
+            !mobileMenu.contains(e.target) && 
+            e.target !== menuBtn && 
+            !menuBtn.contains(e.target)) {
+          mobileMenu.classList.remove('open');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

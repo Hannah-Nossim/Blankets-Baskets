@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<!-- add-ons.html -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Blankets & Baskets — Add-ons</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    body { 
+      font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+      min-height: 100vh;
+    }
+    .nav-link {
+      position: relative;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -4px;
+      left: 0;
+      background-color: #0d9488;
+      transition: width 0.3s ease;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    .nav-link.active::after {
+      width: 100%;
+    }
+    .cart-notification {
+      animation: slideIn 0.3s ease-out;
+    }
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    .mobile-menu {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+    .mobile-menu.open {
+      transform: translateX(0);
+    }
+    .addon-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .addon-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    .add-to-cart-btn {
+      transition: all 0.3s ease;
+    }
+    .add-to-cart-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+    }
+    .category-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .category-utensils {
+      background-color: #f0f9ff;
+      color: #0369a1;
+    }
+    .category-serving {
+      background-color: #fef7cd;
+      color: #854d0e;
+    }
+    .category-storage {
+      background-color: #f3e8ff;
+      color: #7c3aed;
+    }
+    .category-decor {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+    .quantity-btn {
+      transition: all 0.2s ease;
+    }
+    .quantity-btn:hover {
+      transform: scale(1.1);
+    }
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .pulse-animation {
+      animation: pulse 0.5s ease-in-out;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Header -->
+  <header class="bg-white shadow sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 py-3">
+      <div class="flex items-center justify-between">
+        <!-- Logo and Mobile Menu Button -->
+        <div class="flex items-center gap-4">
+          <button id="mobileMenuBtn" class="md:hidden text-gray-700">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+          <a href="index.html" class="text-2xl font-extrabold text-teal-600">blankets &amp; baskets</a>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:block">
+          <ul class="flex items-center gap-6 text-gray-700">
+            <li><a href="index.html" class="nav-link hover:text-teal-600">Home</a></li>
+            <li><a href="products.html" class="nav-link hover:text-teal-600">Products</a></li>
+            <li><a href="custom-basket.html" class="nav-link hover:text-teal-600">Custom Basket</a></li>
+            <li><a href="add-ons.html" class="nav-link hover:text-teal-600 active">Add-ons</a></li>
+            <li><a href="cart.html" class="nav-link hover:text-teal-600">Cart</a></li>
+          </ul>
+        </nav>
+
+        <!-- Cart Icon -->
+        <div class="flex items-center gap-4">
+          <a href="cart.html" id="cartLink" class="relative text-gray-700">
+            <i class="fas fa-shopping-cart text-xl"></i>
+            <span id="cartCount" class="absolute -top-2 -right-3 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Menu -->
+  <div id="mobileMenu" class="mobile-menu fixed inset-0 z-40 bg-white w-64 p-6 md:hidden">
+    <div class="flex justify-between items-center mb-8">
+      <div class="text-xl font-extrabold text-teal-600">blankets &amp; baskets</div>
+      <button id="closeMobileMenu" class="text-gray-700">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+    <nav>
+      <ul class="space-y-4 text-gray-700">
+        <li><a href="index.html" class="block py-2 hover:text-teal-600 text-lg">Home</a></li>
+        <li><a href="products.html" class="block py-2 hover:text-teal-600 text-lg">Products</a></li>
+        <li><a href="custom-basket.html" class="block py-2 hover:text-teal-600 text-lg">Custom Basket</a></li>
+        <li><a href="add-ons.html" class="block py-2 hover:text-teal-600 text-lg">Add-ons</a></li>
+        <li><a href="cart.html" class="block py-2 hover:text-teal-600 text-lg">Cart</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Page Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Add-ons & Extras</h1>
+      <p class="text-gray-600">Enhance your picnic experience with these extras. Mix and match to create the perfect setup!</p>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="mb-8 bg-white p-6 rounded-xl shadow">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex-1">
+          <div class="relative">
+            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            <input 
+              type="text" 
+              id="searchAddons" 
+              placeholder="Search add-ons by name, category, or description..." 
+              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+            >
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <select id="sortAddons" class="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500">
+            <option value="name-asc">Sort by: Name A-Z</option>
+            <option value="name-desc">Name Z-A</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Categories Tabs -->
+    <div class="mb-8">
+      <h2 class="text-xl font-semibold text-gray-800 mb-4">Filter by Category</h2>
+      
+      <!-- Category Tabs -->
+      <div class="flex flex-wrap gap-2">
+        <button class="category-tab px-4 py-2 rounded-full bg-teal-600 text-white font-medium transition-all" data-category="all">
+          <i class="fas fa-layer-group mr-2"></i>All Add-ons
+        </button>
+        <button class="category-tab px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 font-medium transition-all" data-category="utensils">
+          <i class="fas fa-utensils mr-2"></i>Utensils
+        </button>
+        <button class="category-tab px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 font-medium transition-all" data-category="serving">
+          <i class="fas fa-concierge-bell mr-2"></i>Serving
+        </button>
+        <button class="category-tab px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 font-medium transition-all" data-category="storage">
+          <i class="fas fa-box mr-2"></i>Storage
+        </button>
+        <button class="category-tab px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 font-medium transition-all" data-category="decor">
+          <i class="fas fa-palette mr-2"></i>Decor
+        </button>
+      </div>
+    </div>
+
+    <!-- Add-ons Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 fade-in" id="addonsGrid">
+      <!-- Add-ons will be dynamically loaded -->
+    </div>
+
+    <!-- No Results Message (Hidden by default) -->
+    <div id="noResults" class="hidden col-span-full text-center py-12">
+      <i class="fas fa-search text-4xl text-gray-300 mb-4"></i>
+      <h3 class="text-xl font-semibold text-gray-700 mb-2">No add-ons found</h3>
+      <p class="text-gray-500 mb-4">Try adjusting your search or filter criteria</p>
+      <button id="clearFilters" class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
+        Clear All Filters
+      </button>
+    </div>
+    
+    <!-- Statistics -->
+    <div class="mt-12 p-6 bg-gradient-to-r from-teal-50 to-teal-100 rounded-xl">
+      <h2 class="text-xl font-bold text-gray-800 mb-4">Add-ons CategorySummary</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white p-4 rounded-lg shadow text-center">
+          <div class="text-2xl font-bold text-teal-600" id="totalAddons">12</div>
+          <div class="text-gray-600 text-sm">Total Add-ons</div>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow text-center">
+          <div class="text-2xl font-bold text-teal-600" id="utensilsCount">4</div>
+          <div class="text-gray-600 text-sm">Utensils</div>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow text-center">
+          <div class="text-2xl font-bold text-teal-600" id="servingCount">2</div>
+          <div class="text-gray-600 text-sm">Serving Items</div>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow text-center">
+          <div class="text-2xl font-bold text-teal-600" id="decorCount">3</div>
+          <div class="text-gray-600 text-sm">Decor Items</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+   <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-12">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <!-- Company Info -->
+        <div>
+          <div class="text-2xl font-extrabold text-teal-400 mb-4">blankets &amp; baskets</div>
+          <p class="text-gray-300">Fresh picnic kits for memorable outdoor moments.</p>
+          <div class="flex gap-4 mt-4">
+            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook text-xl"></i></a>
+            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-instagram text-xl"></i></a>
+            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter text-xl"></i></a>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div>
+          <h4 class="text-lg font-bold mb-4">Quick Links</h4>
+          <ul class="space-y-2">
+            <li><a href="index.html" class="text-gray-300 hover:text-white">Home</a></li>
+            <li><a href="products.html" class="text-gray-300 hover:text-white">Products</a></li>
+            <li><a href="custom-basket.html" class="text-gray-300 hover:text-white">Custom Basket</a></li>
+            <li><a href="add-ons.html" class="text-gray-300 hover:text-white">Add-ons</a></li>
+            <li><a href="register.html" class="text-gray-300 hover:text-white">Register</a></li>
+            <li><a href="login.html" class="text-gray-300 hover:text-white">Login</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact -->
+        <div>
+          <h4 class="text-lg font-bold mb-4">Contact</h4>
+          <ul class="space-y-2 text-gray-300">
+            <li class="flex items-center gap-2"><i class="fas fa-phone"></i> +254 700 123 456</li>
+            <li class="flex items-center gap-2"><i class="fas fa-envelope"></i> hello@blanketsbaskets.co.ke</li>
+            <li class="flex items-center gap-2"><i class="fas fa-map-marker-alt"></i> Nairobi, Kenya</li>
+          </ul>
+        </div>
+
+        <!-- Payment Methods -->
+        <div>
+          <h4 class="text-lg font-bold mb-4">Payment Methods</h4>
+          <div class="flex flex-wrap gap-2">
+            <div class="bg-white text-gray-800 px-3 py-1 rounded text-sm font-medium">M-Pesa</div>
+            <div class="bg-white text-gray-800 px-3 py-1 rounded text-sm font-medium">Visa</div>
+            <div class="bg-white text-gray-800 px-3 py-1 rounded text-sm font-medium">Mastercard</div>
+          </div>
+          <p class="text-sm text-gray-400 mt-4">Secure payments guaranteed</p>
+          
+          <!-- Security Badges - Added -->
+          <div class="mt-4 flex flex-wrap gap-2">
+            <div class="bg-teal-600 text-white px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
+              <i class="fas fa-lock"></i>
+              <span>SSL Secured</span>
+            </div>
+            <div class="bg-teal-600 text-white px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
+              <i class="fas fa-shield-alt"></i>
+              <span>PCI DSS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legal & Compliance Section - Added -->
+      <div class="border-t border-gray-700 mt-8 pt-6">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="mb-4 md:mb-0">
+            <div class="flex flex-wrap gap-4 text-sm text-gray-400">
+              <a href="documents/Blankets_and_Baskets_Security_and_Privacy_Policy.pdf" class="hover:text-white">Privacy Policy</a>
+              <a href="#" class="hover:text-white">Terms of Service</a>
+              <a href="#" class="hover:text-white">Cookie Policy</a>
+              <a href="#" class="hover:text-white">Data Processing Agreement</a>
+              <a href="#" class="hover:text-white">Security Center</a>
+            </div>
+          </div>
+          
+          <!-- Security Compliance Badges - Added -->
+          <div class="flex flex-wrap gap-3">
+            <div class="flex items-center gap-1 text-sm text-gray-400">
+              <i class="fas fa-user-shield text-teal-400"></i>
+              <span>GDPR Ready</span>
+            </div>
+            <div class="flex items-center gap-1 text-sm text-gray-400">
+              <i class="fas fa-check-circle text-teal-400"></i>
+              <span>ISO 27001</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-700 mt-6 pt-8 text-center text-gray-400">
+        <p>&copy; 2025 Blankets &amp; Baskets. All rights reserved.</p>
+        <p class="text-sm mt-2">Demo static mockup. M-Pesa integration via Safaricom Daraja API.</p>
+        
+        <!-- E-commerce Security Notice -->
+        <div class="mt-4 text-xs text-gray-500 max-w-2xl mx-auto">
+          <p>This e-commerce platform implements six key dimensions of security: <span class="text-teal-300">Integrity</span>, <span class="text-teal-300">Non-repudiation</span>, <span class="text-teal-300">Authenticity</span>, <span class="text-teal-300">Confidentiality</span>, <span class="text-teal-300">Privacy</span>, and <span class="text-teal-300">Availability</span>.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating Cart Button -->
+  <a href="cart.html" id="floatingCartBtn" class="fixed bottom-6 left-6 bg-teal-600 text-white p-3 rounded-full shadow-lg hover:bg-teal-700 transition-all z-20 flex items-center gap-2 hover:shadow-xl">
+    <i class="fas fa-shopping-cart text-lg"></i>
+    <span class="font-medium hidden md:inline">View Cart</span>
+    <span id="floatingCartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">0</span>
+  </a>
+
+  <!-- Cart Notification -->
+  <div id="cartNotification" class="fixed bottom-4 right-4 bg-teal-600 text-white p-4 rounded-lg shadow-lg cart-notification hidden max-w-sm z-30">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <i class="fas fa-check-circle text-xl"></i>
+        <div>
+          <p class="font-medium" id="notificationTitle">Item added to cart!</p>
+          <p class="text-sm text-teal-100" id="notificationMessage"></p>
+        </div>
+      </div>
+      <button id="closeNotification" class="text-teal-200 hover:text-white">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Cart Management
+    const CART_KEY = 'bb_cart_v2';
+    
+    function loadCart() {
+      try {
+        const cart = localStorage.getItem(CART_KEY);
+        return cart ? JSON.parse(cart) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+    
+    function saveCart(cart) {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+      updateCartCount();
+    }
+    
+    function updateCartCount() {
+      const cart = loadCart();
+      const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+      
+      // Update cart count in header
+      const cartCount = document.getElementById('cartCount');
+      if (cartCount) {
+        cartCount.textContent = total;
+        cartCount.classList.toggle('hidden', total === 0);
+      }
+      
+      // Update floating cart button count
+      const floatingCartCount = document.getElementById('floatingCartCount');
+      if (floatingCartCount) {
+        floatingCartCount.textContent = total;
+        floatingCartCount.classList.toggle('hidden', total === 0);
+      }
+    }
+    
+    // Add-ons Data
+    const ADDONS = [
+      { 
+        id: 'napkins', 
+        name: 'Paper Napkins', 
+        price: 150, 
+        category: 'utensils',
+        description: 'Quality paper napkins (pack of 50) for your picnic.',
+        icon: 'fa-napkin'
+      },
+      { 
+        id: 'plates', 
+        name: 'Disposable Plates', 
+        price: 250, 
+        category: 'utensils',
+        description: 'Sturdy disposable plates (pack of 10).',
+        icon: 'fa-plate-utensils'
+      },
+      { 
+        id: 'utensils', 
+        name: 'Disposable Utensil Set', 
+        price: 200, 
+        category: 'utensils',
+        description: 'Forks, knives, and spoons (pack of 10).',
+        icon: 'fa-utensils'
+      },
+      { 
+        id: 'icebox', 
+        name: 'Portable Icebox', 
+        price: 1200, 
+        category: 'storage',
+        description: 'Small icebox to keep drinks and food cool.',
+        icon: 'fa-snowflake'
+      },
+      { 
+        id: 'blanket', 
+        name: 'Picnic Blanket', 
+        price: 950, 
+        category: 'decor',
+        description: 'Water-resistant picnic blanket for comfortable seating.',
+        icon: 'fa-blanket'
+      },
+      { 
+        id: 'candles', 
+        name: 'LED Candles', 
+        price: 300, 
+        category: 'decor',
+        description: 'Flame-free ambiance lighting (set of 4).',
+        icon: 'fa-candle'
+      },
+      { 
+        id: 'thermos', 
+        name: 'Insulated Thermos', 
+        price: 450, 
+        category: 'serving',
+        description: 'Keep drinks hot or cold for hours.',
+        icon: 'fa-mug-hot'
+      },
+      { 
+        id: 'basket', 
+        name: 'Woven Picnic Basket', 
+        price: 1200, 
+        category: 'storage',
+        description: 'Traditional woven picnic basket with handles.',
+        icon: 'fa-basket-shopping'
+      },
+      { 
+        id: 'cutlery-set', 
+        name: 'Reusable Cutlery Set', 
+        price: 350, 
+        category: 'utensils',
+        description: 'Eco-friendly reusable utensils (3 sets).',
+        icon: 'fa-cutlery'
+      },
+      { 
+        id: 'speaker', 
+        name: 'Bluetooth Speaker', 
+        price: 1900, 
+        category: 'decor',
+        description: 'Water-resistant portable speaker for music.',
+        icon: 'fa-music'
+      },
+      { 
+        id: 'cooler-bag', 
+        name: 'Insulated Cooler Bag', 
+        price: 400, 
+        category: 'storage',
+        description: 'Lightweight cooler bag for drinks and snacks.',
+        icon: 'fa-bag-shopping'
+      },
+      { 
+        id: 'flowers', 
+        name: 'Fresh Flower Bouquet', 
+        price: 1800, 
+        category: 'decor',
+        description: 'Beautiful fresh flowers for decoration.',
+        icon: 'fa-flower'
+      }
+    ];
+    
+    // Filter and sort state
+    let currentCategory = 'all';
+    let currentSearch = '';
+    let currentSort = 'name-asc';
+    
+    // Render filtered add-ons
+    function filterAndRenderAddons() {
+      let filtered = [...ADDONS];
+      
+      // Filter by category
+      if (currentCategory !== 'all') {
+        filtered = filtered.filter(addon => addon.category === currentCategory);
+      }
+      
+      // Filter by search
+      if (currentSearch) {
+        filtered = filtered.filter(addon => 
+          addon.name.toLowerCase().includes(currentSearch) ||
+          addon.description.toLowerCase().includes(currentSearch) ||
+          addon.category.toLowerCase().includes(currentSearch)
+        );
+      }
+      
+      // Sort
+      filtered.sort((a, b) => {
+        switch(currentSort) {
+          case 'name-desc':
+            return b.name.localeCompare(a.name);
+          case 'price-asc':
+            return a.price - b.price;
+          case 'price-desc':
+            return b.price - a.price;
+          default: // name-asc
+            return a.name.localeCompare(b.name);
+        }
+      });
+      
+      // Update statistics
+      updateStatistics(filtered);
+      
+      // Render filtered add-ons or show no results
+      const container = document.getElementById('addonsGrid');
+      const noResults = document.getElementById('noResults');
+      
+      if (filtered.length === 0) {
+        container.innerHTML = '';
+        container.classList.add('hidden');
+        noResults.classList.remove('hidden');
+        return;
+      }
+      
+      container.classList.remove('hidden');
+      noResults.classList.add('hidden');
+      
+      container.innerHTML = filtered.map(addon => `
+        <div class="addon-card bg-white rounded-xl shadow p-5 fade-in" data-category="${addon.category}">
+          <div class="aspect-square rounded-lg bg-gradient-to-r from-teal-50 to-teal-100 flex items-center justify-center mb-4 relative">
+            <i class="fas ${addon.icon || 'fa-plus'} text-4xl text-teal-400"></i>
+            <span class="absolute top-2 right-2 ${getCategoryClass(addon.category)} text-xs px-2 py-1 rounded-full font-medium">
+              ${addon.category.charAt(0).toUpperCase() + addon.category.slice(1)}
+            </span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-1">${addon.name}</h3>
+          <p class="text-gray-600 text-sm mb-4">${addon.description}</p>
+          
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-xl font-bold text-gray-800">KSh ${addon.price}</span>
+            <div class="flex items-center space-x-2">
+              <button class="quantity-btn minus w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center" data-id="${addon.id}">
+                <i class="fas fa-minus text-xs"></i>
+              </button>
+              <span class="quantity-display w-8 text-center font-medium" data-id="${addon.id}">1</span>
+              <button class="quantity-btn plus w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center" data-id="${addon.id}">
+                <i class="fas fa-plus text-xs"></i>
+              </button>
+            </div>
+          </div>
+          
+          <button class="add-to-cart-btn w-full bg-teal-600 hover:bg-teal-700 text-white px-4 py-3 rounded-lg font-medium flex items-center justify-center gap-2" data-id="${addon.id}">
+            <i class="fas fa-cart-plus"></i>
+            Add to Cart
+          </button>
+        </div>
+      `).join('');
+      
+      setupAddonEventListeners();
+    }
+    
+    // Get category CSS class
+    function getCategoryClass(category) {
+      const classes = {
+        'utensils': 'bg-blue-100 text-blue-800',
+        'serving': 'bg-yellow-100 text-yellow-800',
+        'storage': 'bg-purple-100 text-purple-800',
+        'decor': 'bg-green-100 text-green-800'
+      };
+      return classes[category] || 'bg-gray-100 text-gray-800';
+    }
+    
+    // Update statistics
+    function updateStatistics(filteredAddons) {
+      document.getElementById('totalAddons').textContent = filteredAddons.length;
+      
+      const utensilsCount = filteredAddons.filter(a => a.category === 'utensils').length;
+      const servingCount = filteredAddons.filter(a => a.category === 'serving').length;
+      const storageCount = filteredAddons.filter(a => a.category === 'storage').length;
+      const decorCount = filteredAddons.filter(a => a.category === 'decor').length;
+      
+      document.getElementById('utensilsCount').textContent = utensilsCount;
+      document.getElementById('servingCount').textContent = servingCount;
+      document.getElementById('decorCount').textContent = decorCount;
+    }
+    
+    // Setup event listeners for add-on interactions
+    function setupAddonEventListeners() {
+      // Quantity buttons
+      document.querySelectorAll('.quantity-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+          const btn = e.currentTarget;
+          const addonId = btn.dataset.id;
+          const isPlus = btn.classList.contains('plus');
+          updateQuantity(addonId, isPlus);
+          
+          // Add pulse animation to the quantity display
+          const display = document.querySelector(`.quantity-display[data-id="${addonId}"]`);
+          display.classList.add('pulse-animation');
+          setTimeout(() => display.classList.remove('pulse-animation'), 500);
+        });
+      });
+      
+      // Add to cart buttons
+      document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+          const btn = e.currentTarget;
+          const addonId = btn.dataset.id;
+          const quantity = getQuantity(addonId);
+          
+          // Add click animation
+          btn.classList.add('pulse-animation');
+          setTimeout(() => btn.classList.remove('pulse-animation'), 300);
+          
+          addAddonToCart(addonId, quantity);
+        });
+      });
+    }
+    
+    // Update quantity for an add-on
+    function updateQuantity(addonId, isPlus) {
+      const display = document.querySelector(`.quantity-display[data-id="${addonId}"]`);
+      let quantity = parseInt(display.textContent) || 1;
+      
+      if (isPlus) {
+        quantity = Math.min(quantity + 1, 10); // Max 10
+      } else {
+        quantity = Math.max(quantity - 1, 1); // Min 1
+      }
+      
+      display.textContent = quantity;
+    }
+    
+    // Get current quantity for an add-on
+    function getQuantity(addonId) {
+      const display = document.querySelector(`.quantity-display[data-id="${addonId}"]`);
+      return parseInt(display.textContent) || 1;
+    }
+    
+    // Add addon to cart
+    function addAddonToCart(addonId, quantity = 1) {
+      const addon = ADDONS.find(a => a.id === addonId);
+      if (!addon) return;
+      
+      const cart = loadCart();
+      const existingItemIndex = cart.findIndex(item => item.id === addonId && item.type === 'addon');
+      
+      if (existingItemIndex > -1) {
+        cart[existingItemIndex].quantity += quantity;
+      } else {
+        cart.push({
+          id: addon.id,
+          name: addon.name,
+          price: addon.price,
+          quantity: quantity,
+          type: 'addon',
+          category: addon.category
+        });
+      }
+      
+      saveCart(cart);
+      showCartNotification(addon.name, quantity);
+      
+      // Animate the floating cart button
+      const floatingBtn = document.getElementById('floatingCartBtn');
+      floatingBtn.classList.add('pulse-animation');
+      setTimeout(() => floatingBtn.classList.remove('pulse-animation'), 500);
+    }
+    
+    // Show cart notification
+    function showCartNotification(productName, quantity) {
+      const notification = document.getElementById('cartNotification');
+      const title = document.getElementById('notificationTitle');
+      const message = document.getElementById('notificationMessage');
+      
+      title.textContent = quantity > 1 ? 'Items added to cart!' : 'Item added to cart!';
+      message.textContent = `${quantity}x ${productName}`;
+      
+      notification.classList.remove('hidden');
+      
+      // Auto-hide after 3 seconds
+      setTimeout(() => {
+        notification.classList.add('hidden');
+      }, 3000);
+    }
+    
+    // Setup category filtering and search
+    function setupFilters() {
+      // Category tabs
+      document.querySelectorAll('.category-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          // Update active tab
+          document.querySelectorAll('.category-tab').forEach(t => {
+            t.classList.remove('bg-teal-600', 'text-white');
+            t.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+          });
+          
+          tab.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+          tab.classList.add('bg-teal-600', 'text-white');
+          
+          currentCategory = tab.dataset.category;
+          filterAndRenderAddons();
+        });
+      });
+      
+      // Search input
+      const searchInput = document.getElementById('searchAddons');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          currentSearch = e.target.value.toLowerCase();
+          filterAndRenderAddons();
+        });
+      }
+      
+      // Sort select
+      const sortSelect = document.getElementById('sortAddons');
+      if (sortSelect) {
+        sortSelect.addEventListener('change', (e) => {
+          currentSort = e.target.value;
+          filterAndRenderAddons();
+        });
+      }
+      
+      // Clear filters button
+      const clearFiltersBtn = document.getElementById('clearFilters');
+      if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', () => {
+          currentCategory = 'all';
+          currentSearch = '';
+          currentSort = 'name-asc';
+          
+          // Reset UI
+          document.querySelectorAll('.category-tab').forEach((t, i) => {
+            if (i === 0) {
+              t.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+              t.classList.add('bg-teal-600', 'text-white');
+            } else {
+              t.classList.remove('bg-teal-600', 'text-white');
+              t.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+            }
+          });
+          
+          if (searchInput) searchInput.value = '';
+          if (sortSelect) sortSelect.value = 'name-asc';
+          
+          filterAndRenderAddons();
+        });
+      }
+    }
+    
+    // Mobile Menu
+    document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.add('open');
+    });
+    
+    document.getElementById('closeMobileMenu')?.addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.remove('open');
+    });
+    
+    // Close notification
+    document.getElementById('closeNotification')?.addEventListener('click', () => {
+      document.getElementById('cartNotification').classList.add('hidden');
+    });
+    
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+      const mobileMenu = document.getElementById('mobileMenu');
+      const menuBtn = document.getElementById('mobileMenuBtn');
+      
+      if (mobileMenu?.classList.contains('open') && 
+          !mobileMenu.contains(e.target) && 
+          e.target !== menuBtn && 
+          !menuBtn?.contains(e.target)) {
+        mobileMenu.classList.remove('open');
+      }
+    });
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      updateCartCount();
+      
+      // Highlight current page in nav
+      const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+      document.querySelectorAll('.nav-link').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href === currentPage) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+      
+      // Initial render
+      filterAndRenderAddons();
+      setupFilters();
+    });
+  </script>
+</body>
+</html>

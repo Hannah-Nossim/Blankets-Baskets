@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<!-- products.html -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Blankets & Baskets — All Products</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    body { 
+      font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+      min-height: 100vh;
+    }
+    .product-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    .category-filter label {
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .category-filter input:checked + span {
+      background-color: #0d9488;
+      color: white;
+      border-color: #0d9488;
+    }
+    .nav-link {
+      position: relative;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -4px;
+      left: 0;
+      background-color: #0d9488;
+      transition: width 0.3s ease;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    .nav-link.active::after {
+      width: 100%;
+    }
+    .cart-notification {
+      animation: slideIn 0.3s ease-out;
+    }
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    .mobile-menu {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+    .mobile-menu.open {
+      transform: translateX(0);
+    }
+    .quantity-btn {
+      transition: all 0.2s ease;
+    }
+    .quantity-btn:hover {
+      background-color: #f3f4f6;
+    }
+    .add-to-cart-btn {
+      transition: all 0.3s ease;
+    }
+    .add-to-cart-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+    }
+    .view-details-btn {
+      transition: all 0.3s ease;
+    }
+    .view-details-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    .buy-now-btn {
+      transition: all 0.3s ease;
+    }
+    .buy-now-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+    .filter-option {
+      transition: all 0.2s ease;
+    }
+    .filter-option:hover {
+      background-color: #f3f4f6;
+    }
+    .filter-option.active {
+      background-color: #0d9488;
+      color: white;
+    }
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-content {
+      background-color: white;
+      border-radius: 12px;
+      max-width: 800px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      animation: modalFade 0.3s ease;
+    }
+    @keyframes modalFade {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .modal-header {
+      background-color: #4CAF50;
+      color: white;
+      padding: 20px 25px;
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h3 {
+      font-size: 1.8rem;
+    }
+    .close-modal {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 2rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .modal-body {
+      padding: 25px;
+    }
+    .modal-product-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 25px;
+    }
+    .modal-product-image {
+      background-color: #f5f5f5;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      min-height: 250px;
+    }
+    .modal-product-image i {
+      font-size: 8rem;
+      color: #c8e6c9;
+    }
+    .modal-product-info h4 {
+      color: #2E7D32;
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+    }
+    .modal-ingredients ul {
+      columns: 2;
+      list-style-type: none;
+      margin-top: 10px;
+    }
+    .modal-ingredients li {
+      padding: 5px 0;
+      border-bottom: 1px dotted #e0e0e0;
+    }
+    .modal-ingredients li:last-child {
+      border-bottom: none;
+    }
+    .modal-ingredients li i {
+      color: #4CAF50;
+      margin-right: 8px;
+    }
+    /* Sale badge animation */
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+      }
+    }
+    .sale-badge {
+      animation: pulse 2s infinite;
+    }
+    /* Delivery estimate animation */
+    .delivery-estimate {
+      animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* Low stock animation */
+    @keyframes lowStockPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(245, 158, 11, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+      }
+    }
+    .low-stock-badge {
+      animation: lowStockPulse 3s infinite;
+    }
+    @media (max-width: 768px) {
+      .modal-product-details {
+        grid-template-columns: 1fr;
+      }
+      .modal-ingredients ul {
+        columns: 1;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Header -->
+  <header class="bg-white shadow sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 py-3">
+      <div class="flex items-center justify-between">
+        <!-- Logo and Mobile Menu Button -->
+        <div class="flex items-center gap-4">
+          <button id="mobileMenuBtn" class="md:hidden text-gray-700">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+          <a href="index.html" class="text-2xl font-extrabold text-teal-600">blankets &amp; baskets</a>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:block">
+          <ul class="flex items-center gap-6 text-gray-700">
+            <li><a href="index.html" class="nav-link hover:text-teal-600">Home</a></li>
+            <li><a href="products.html" class="nav-link hover:text-teal-600 active">Products</a></li>
+            <li><a href="custom-basket.html" class="nav-link hover:text-teal-600">Custom Basket</a></li>
+            <li><a href="add-ons.html" class="nav-link hover:text-teal-600">Add-ons</a></li>
+            <li><a href="cart.html" class="nav-link hover:text-teal-600">Cart</a></li>
+          </ul>
+        </nav>
+
+        <!-- Cart Icon -->
+        <div class="flex items-center gap-4">
+          <a href="cart.html" id="cartLink" class="relative text-gray-700">
+            <i class="fas fa-shopping-cart text-xl"></i>
+            <span id="cartCount" class="absolute -top-2 -right-3 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Menu -->
+  <div id="mobileMenu" class="mobile-menu fixed inset-0 z-40 bg-white w-64 p-6 md:hidden">
+    <div class="flex justify-between items-center mb-8">
+      <div class="text-xl font-extrabold text-teal-600">blankets &amp; baskets</div>
+      <button id="closeMobileMenu" class="text-gray-700">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+    <nav>
+      <ul class="space-y-4 text-gray-700">
+        <li><a href="index.html" class="block py-2 hover:text-teal-600 text-lg">Home</a></li>
+        <li><a href="products.html" class="block py-2 hover:text-teal-600 text-lg">Products</a></li>
+        <li><a href="custom-basket.html" class="block py-2 hover:text-teal-600 text-lg">Custom Basket</a></li>
+        <li><a href="add-ons.html" class="block py-2 hover:text-teal-600 text-lg">Add-ons</a></li>
+        <li><a href="cart.html" class="block py-2 hover:text-teal-600 text-lg">Cart</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Page Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">All Picnic Kits</h1>
+      <p class="text-gray-600">Browse our selection of pre-made picnic kits for every occasion</p>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+      <!-- Filters Sidebar -->
+      <aside class="lg:w-1/4">
+        <div class="bg-white rounded-xl shadow p-6 mb-6 sticky top-24">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">Filter by Category</h3>
+          <div class="space-y-3">
+            <label class="flex items-center cursor-pointer filter-option p-2 rounded hover:bg-gray-50">
+              <input type="checkbox" class="mr-3" data-category="all" checked>
+              <span>All Products</span>
+            </label>
+            <label class="flex items-center cursor-pointer filter-option p-2 rounded hover:bg-gray-50">
+              <input type="checkbox" class="mr-3" data-category="couple">
+              <span>Couple Kits</span>
+            </label>
+            <label class="flex items-center cursor-pointer filter-option p-2 rounded hover:bg-gray-50">
+              <input type="checkbox" class="mr-3" data-category="family">
+              <span>Family Kits</span>
+            </label>
+            <label class="flex items-center cursor-pointer filter-option p-2 rounded hover:bg-gray-50">
+              <input type="checkbox" class="mr-3" data-category="vegan">
+              <span>Vegan Options</span>
+            </label>
+            <label class="flex items-center cursor-pointer filter-option p-2 rounded hover:bg-gray-50">
+              <input type="checkbox" class="mr-3" data-category="choma">
+              <span>Choma/BBQ</span>
+            </label>
+            <label class="flex items-center cursor-pointer filter-option p-2 rounded hover:bg-gray-50">
+              <input type="checkbox" class="mr-3" data-category="team">
+              <span>Team Outings</span>
+            </label>
+          </div>
+
+          <div class="mt-8">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Sort by</h3>
+            <select id="sortSelect" class="w-full border border-gray-300 rounded-lg p-3">
+              <option value="featured">Featured</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="popular">Most Popular</option>
+              <option value="stock-high">Stock: High to Low</option>
+            </select>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-gray-200">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Quick Links</h3>
+            <ul class="space-y-3">
+              <li><a href="custom-basket.html" class="text-teal-600 hover:text-teal-700 flex items-center gap-2"><i class="fas fa-plus-circle"></i> Build Custom Basket</a></li>
+              <li><a href="add-ons.html" class="text-teal-600 hover:text-teal-700 flex items-center gap-2"><i class="fas fa-star"></i> Browse Add-ons</a></li>
+              <li><a href="cart.html" class="text-teal-600 hover:text-teal-700 flex items-center gap-2"><i class="fas fa-shopping-cart"></i> View Cart</a></li>
+            </ul>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Products Grid -->
+      <section class="lg:w-3/4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="productsGrid">
+          <!-- Products will be dynamically loaded -->
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Delivery Information Section -->
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="bg-blue-50 border border-blue-200 rounded-xl shadow p-6 mb-6">
+      <h3 class="text-lg font-bold text-blue-800 mb-4 flex items-center gap-2">
+        <i class="fas fa-info-circle"></i> Delivery Information
+      </h3>
+      <div class="space-y-3 text-blue-700">
+        <p class="flex items-start gap-2">
+          <i class="fas fa-check-circle mt-1"></i>
+          <span>All food items are prepared fresh on the day of delivery</span>
+        </p>
+        <p class="flex items-start gap-2">
+          <i class="fas fa-clock mt-1"></i>
+          <span>Please consume within 24 hours and keep refrigerated until serving</span>
+        </p>
+        <p class="flex items-start gap-2">
+          <i class="fas fa-exclamation-triangle mt-1"></i>
+          <span>Notify us of any allergies at least 6 hours before delivery</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+   <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-12">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <!-- Company Info -->
+        <div>
+          <div class="text-2xl font-extrabold text-teal-400 mb-4">blankets &amp; baskets</div>
+          <p class="text-gray-300">Fresh picnic kits for memorable outdoor moments.</p>
+          <div class="flex gap-4 mt-4">
+            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook text-xl"></i></a>
+            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-instagram text-xl"></i></a>
+            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter text-xl"></i></a>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div>
+          <h4 class="text-lg font-bold mb-4">Quick Links</h4>
+          <ul class="space-y-2">
+            <li><a href="index.html" class="text-gray-300 hover:text-white">Home</a></li>
+            <li><a href="products.html" class="text-gray-300 hover:text-white">Products</a></li>
+            <li><a href="custom-basket.html" class="text-gray-300 hover:text-white">Custom Basket</a></li>
+            <li><a href="add-ons.html" class="text-gray-300 hover:text-white">Add-ons</a></li>
+            <li><a href="register.html" class="text-gray-300 hover:text-white">Register</a></li>
+            <li><a href="login.html" class="text-gray-300 hover:text-white">Login</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact -->
+        <div>
+          <h4 class="text-lg font-bold mb-4">Contact</h4>
+          <ul class="space-y-2 text-gray-300">
+            <li class="flex items-center gap-2"><i class="fas fa-phone"></i> +254 700 123 456</li>
+            <li class="flex items-center gap-2"><i class="fas fa-envelope"></i> hello@blanketsbaskets.co.ke</li>
+            <li class="flex items-center gap-2"><i class="fas fa-map-marker-alt"></i> Nairobi, Kenya</li>
+          </ul>
+        </div>
+
+        <!-- Payment Methods -->
+        <div>
+          <h4 class="text-lg font-bold mb-4">Payment Methods</h4>
+          <div class="flex flex-wrap gap-2">
+            <div class="bg-white text-gray-800 px-3 py-1 rounded text-sm font-medium">M-Pesa</div>
+            <div class="bg-white text-gray-800 px-3 py-1 rounded text-sm font-medium">Visa</div>
+            <div class="bg-white text-gray-800 px-3 py-1 rounded text-sm font-medium">Mastercard</div>
+          </div>
+          <p class="text-sm text-gray-400 mt-4">Secure payments guaranteed</p>
+          
+          <!-- Security Badges - Added -->
+          <div class="mt-4 flex flex-wrap gap-2">
+            <div class="bg-teal-600 text-white px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
+              <i class="fas fa-lock"></i>
+              <span>SSL Secured</span>
+            </div>
+            <div class="bg-teal-600 text-white px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
+              <i class="fas fa-shield-alt"></i>
+              <span>PCI DSS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legal & Compliance Section - Added -->
+      <div class="border-t border-gray-700 mt-8 pt-6">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="mb-4 md:mb-0">
+            <div class="flex flex-wrap gap-4 text-sm text-gray-400">
+              <a href="documents/Blankets_and_Baskets_Security_and_Privacy_Policy.pdf" class="hover:text-white">Privacy Policy</a>
+              <a href="#" class="hover:text-white">Terms of Service</a>
+              <a href="#" class="hover:text-white">Cookie Policy</a>
+              <a href="#" class="hover:text-white">Data Processing Agreement</a>
+              <a href="#" class="hover:text-white">Security Center</a>
+            </div>
+          </div>
+          
+          <!-- Security Compliance Badges - Added -->
+          <div class="flex flex-wrap gap-3">
+            <div class="flex items-center gap-1 text-sm text-gray-400">
+              <i class="fas fa-user-shield text-teal-400"></i>
+              <span>GDPR Ready</span>
+            </div>
+            <div class="flex items-center gap-1 text-sm text-gray-400">
+              <i class="fas fa-check-circle text-teal-400"></i>
+              <span>ISO 27001</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-700 mt-6 pt-8 text-center text-gray-400">
+        <p>&copy; 2025 Blankets &amp; Baskets. All rights reserved.</p>
+        <p class="text-sm mt-2">Demo static mockup. M-Pesa integration via Safaricom Daraja API.</p>
+        
+        <!-- E-commerce Security Notice - Added -->
+        <div class="mt-4 text-xs text-gray-500 max-w-2xl mx-auto">
+          <p>This e-commerce platform implements six key dimensions of security: <span class="text-teal-300">Integrity</span>, <span class="text-teal-300">Non-repudiation</span>, <span class="text-teal-300">Authenticity</span>, <span class="text-teal-300">Confidentiality</span>, <span class="text-teal-300">Privacy</span>, and <span class="text-teal-300">Availability</span>.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cart Notification -->
+  <div id="cartNotification" class="fixed bottom-4 right-4 bg-teal-600 text-white p-4 rounded-lg shadow-lg cart-notification hidden max-w-sm">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <i class="fas fa-check-circle text-xl"></i>
+        <div>
+          <p class="font-medium" id="notificationTitle">Item added to cart</p>
+          <p class="text-sm text-teal-100" id="notificationMessage"></p>
+        </div>
+      </div>
+      <button id="closeNotification" class="text-teal-200 hover:text-white">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Product Details Modal -->
+  <div class="modal" id="productModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">Family Fun Picnic Kit</h3>
+        <button class="close-modal" id="closeModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-product-details">
+          <div class="modal-product-image">
+            <i class="fas fa-users" id="modalIcon"></i>
+          </div>
+          <div class="modal-product-info">
+            <h4 id="modalProductName">Family Fun Picnic Kit</h4>
+            
+            <!-- Trust Signals in Modal -->
+            <div class="flex items-center gap-3 mb-4">
+              <div class="flex items-center">
+                <div class="flex text-yellow-400">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star-half-alt"></i>
+                </div>
+                <span class="ml-2 text-sm font-medium text-gray-700" id="modalRating">4.7</span>
+                <span class="mx-2 text-gray-400">•</span>
+                <span class="text-sm text-gray-600" id="modalReviews">(1,248 reviews)</span>
+              </div>
+              <div class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold flex items-center gap-1">
+                <i class="fas fa-check-circle"></i>
+                <span>Certified Vendor</span>
+              </div>
+            </div>
+            
+            <p id="modalDescription" class="text-gray-700 mb-4"></p>
+            
+            <!-- Stock Information in Modal -->
+            <div class="mb-4">
+              <div id="modalStockInfo">
+                <!-- Stock info will be inserted here -->
+              </div>
+            </div>
+            
+            <!-- Pricing in Modal -->
+            <div class="mb-4">
+              <div class="flex items-baseline gap-3 mb-2">
+                <span class="text-3xl font-bold text-red-600" id="modalPrice">KSh 3,230</span>
+                <span class="text-xl text-gray-500 line-through" id="modalOriginalPrice">KSh 3,800</span>
+                <span class="sale-badge bg-red-100 text-red-800 px-2 py-1 rounded text-sm font-bold">
+                  <span id="modalDiscount">15% OFF</span>
+                </span>
+              </div>
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-sm font-medium bg-teal-100 text-teal-700 px-2 py-1 rounded" id="modalPax">5 pax</span>
+                <span class="text-sm font-medium bg-gray-100 text-gray-700 px-2 py-1 rounded" id="modalCategory">family</span>
+              </div>
+            </div>
+            
+            <div class="modal-ingredients">
+              <h5 class="font-bold text-gray-800 mb-2">What's Included:</h5>
+              <ul id="modalIngredients">
+                <!-- Filled by JavaScript -->
+              </ul>
+            </div>
+            
+            <!-- Delivery Information in Modal -->
+            <div class="mt-6 p-4 bg-gray-50 rounded-lg delivery-estimate">
+              <h5 class="font-bold text-gray-800 mb-3">Delivery Information</h5>
+              <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="font-medium text-gray-800">Standard Delivery</div>
+                    <div class="text-sm text-gray-600">3-5 hours • Nairobi CBD</div>
+                  </div>
+                  <div class="font-bold text-teal-600">FREE</div>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="font-medium text-gray-800">Express Delivery</div>
+                    <div class="text-sm text-gray-600">1-2 hours • Available Nairobi-wide</div>
+                  </div>
+                  <div class="font-bold text-gray-800">KSh 250</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <div class="flex items-start gap-3">
+            <i class="fas fa-info-circle text-blue-500 text-xl mt-1"></i>
+            <div>
+              <h5 class="font-bold text-blue-800 mb-1">Important Note</h5>
+              <p class="text-blue-700 text-sm">
+                All food items are prepared fresh on the day of delivery. Please consume within 24 hours 
+                and keep refrigerated until serving. Notify us of any allergies at least 6 hours before delivery.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Cart Management
+    const CART_KEY = 'bb_cart_v2';
+    
+    function loadCart() {
+      try {
+        const cart = localStorage.getItem(CART_KEY);
+        return cart ? JSON.parse(cart) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+    
+    function saveCart(cart) {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+      updateCartCount();
+    }
+    
+    function updateCartCount() {
+      const cart = loadCart();
+      const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+      const cartCount = document.getElementById('cartCount');
+      if (cartCount) {
+        cartCount.textContent = total;
+        if (total > 0) {
+          cartCount.classList.remove('hidden');
+        } else {
+          cartCount.classList.add('hidden');
+        }
+      }
+    }
+    
+    // Enhanced Product Data with sale prices, ratings, trust signals, and stock information
+    const PRODUCTS = [
+      { 
+        id: 'classic-couple',
+        name: 'Classic Couple Kit', 
+        price: 1700, // Sale price
+        originalPrice: 2000,
+        category: 'couple',
+        pax: 2,
+        description: 'Perfect for romantic outings or casual dates. This kit includes all the essentials for a delightful picnic experience for two.',
+        imageColor: 'from-amber-100 to-orange-100',
+        icon: 'fa-heart',
+        iconColor: 'text-amber-300',
+        rating: 4.5,
+        reviews: 892,
+        isCertified: true,
+        stock: 15, // Remaining stock
+        maxStock: 20, // Maximum stock capacity
+        isLowStock: true, // Flag for low stock
+        details: [
+          '2 Gourmet Sandwiches (choice of beef/chicken)',
+          '2 Bottles of Fruit Juice (mango/orange)',
+          'Dessert selection (ice cream/cupcakes/chocolate)',
+          'Fresh Pasta Salad with herbs'
+       ]
+      },
+      { 
+        id: 'family-fun',
+        name: 'Family Fun Kit - Premium Edition', 
+        price: 3655, // Sale price
+        originalPrice: 4300,
+        category: 'family',
+        pax: 5,
+        description: 'The ultimate family picnic solution with diverse food options that cater to both kids and adults. Perfect for birthdays and family gatherings.',
+        imageColor: 'from-blue-100 to-cyan-100',
+        icon: 'fa-users',
+        iconColor: 'text-blue-300',
+        rating: 4.7,
+        reviews: 1248,
+        isCertified: true,
+        stock: 8, // Remaining stock
+        maxStock: 25, // Maximum stock capacity
+        isLowStock: true, // Flag for low stock
+        details: [
+          '5 Mini Pizzas (Pepperoni, Margherita, BBQ Chicken)',
+          '10 Beef Samosas with dipping sauce',
+          'Caesar Salad with fresh croutons',
+          'French Fries with special seasoning',
+          '10 Chicken Wings (BBQ & Peri-Peri flavors)',
+          '5 Bottled Juices (Orange, Apple, Pineapple)',
+          '5 Chocolate Cupcakes'         
+        ]
+      },
+      { 
+        id: 'choma-box',
+        name: 'Choma Box - Grill Master', 
+        price: 5525, // Sale price
+        originalPrice: 6500,
+        category: 'choma',
+        pax: 5,
+        description: 'Authentic Kenyan grill experience perfect for outdoor gatherings and celebrations. Comes with traditional accompaniments.',
+        imageColor: 'from-red-100 to-orange-100',
+        icon: 'fa-fire',
+        iconColor: 'text-red-300',
+        rating: 4.6,
+        reviews: 1048,
+        isCertified: true,
+        stock: 22, // Remaining stock
+        maxStock: 30, // Maximum stock capacity
+        isLowStock: false, // Flag for low stock
+        details: [
+          'Grilled meat selection (chicken/beef/mutton/pork)',
+          'Fresh Kachumbari salad with tomatoes and onions',
+          'Ugali portions (made from maize flour)',
+          'Traditional Sukuma Wiki (collard greens)',
+          'Spicy homemade chili sauce',
+          'Lemon wedges and fresh herbs'
+        ]
+      },
+      { 
+        id: 'vegan-chill',
+        name: 'Vegan Delight Pack', 
+        price: 2550, // Sale price
+        originalPrice: 3000,
+        category: 'vegan',
+        pax: 5,
+        description: 'Completely plant-based picnic experience with fresh, flavorful options that satisfy both vegans and non-vegans alike.',
+        imageColor: 'from-green-100 to-emerald-100',
+        icon: 'fa-leaf',
+        iconColor: 'text-green-300',
+        rating: 4.8,
+        reviews: 1245,
+        isCertified: false,
+        stock: 3, // Remaining stock
+        maxStock: 15, // Maximum stock capacity
+        isLowStock: true, // Flag for low stock
+        details: [
+          'Veggie Wraps with hummus and fresh vegetables',
+          'Green Smoothies (kale, spinach, mango)',
+          'Fresh Fruit Salad with mint dressing',
+          'Assorted Natural Juices',
+          'Vegan Cookies and energy balls',
+          'Mixed Nuts and dried fruit pack',
+          'Bamboo cutlery and compostable plates'
+        ]
+      },
+      { 
+        id: 'team-outing',
+        name: 'Team Building Kit', 
+        price: 9350, // Sale price
+        originalPrice: 11000,
+        category: 'team',
+        pax: 10,
+        description: 'Perfect for corporate retreats, team building events, or large family gatherings. Designed to feed a crowd with variety.',
+        imageColor: 'from-purple-100 to-violet-100',
+        icon: 'fa-users',
+        iconColor: 'text-purple-300',
+        rating: 4.9,
+        reviews: 2156,
+        isCertified: true,
+        stock: 12, // Remaining stock
+        maxStock: 20, // Maximum stock capacity
+        isLowStock: false, // Flag for low stock
+        details: [
+          '10 Gourmet Burgers with assorted toppings',
+          'Large portion of French Fries',
+          'Assorted Sodas (Coke, Fanta, Sprite)',
+          'Fresh Garden Salad with dressing',
+          '3kg Celebration Cake (vanilla/chocolate)',
+          '20 Chicken Wings (3 flavor options)'          
+        ]
+      },
+      { 
+        id: 'romantic-evening',
+        name: 'Romantic Evening Kit', 
+        price: 2550, // Sale price
+        originalPrice: 3000,
+        category: 'couple',
+        pax: 2,
+        description: 'Create magical moments with this premium romantic setup. Perfect for anniversaries, proposals, or special date nights.',
+        imageColor: 'from-pink-100 to-rose-100',
+        icon: 'fa-heart',
+        iconColor: 'text-pink-300',
+        rating: 4.4,
+        reviews: 567,
+        isCertified: true,
+        stock: 0, // Remaining stock - Out of stock
+        maxStock: 12, // Maximum stock capacity
+        isLowStock: false, // Flag for low stock
+        isOutOfStock: true, // Special flag for out of stock
+        details: [
+          'Premium Cheese Platter with crackers',
+          'Sparkling Wine or non-alcoholic alternative',
+          'Chocolate Covered Strawberries',
+          'Decorative Candles and matches',
+          'Rose Petals for decoration',
+          'Premium Chocolate Truffles'          
+        ]
+      },
+      { 
+        id: 'kids-party',
+        name: 'Kids Party Pack', 
+        price: 3400, // Sale price
+        originalPrice: 4000,
+        category: 'family',
+        pax: 6,
+        description: 'Designed specifically for children\'s parties and playdates. Kid-friendly foods with fun presentation and activities.',
+        imageColor: 'from-yellow-100 to-amber-100',
+        icon: 'fa-child',
+        iconColor: 'text-yellow-300',
+        rating: 4.6,
+        reviews: 932,
+        isCertified: false,
+        stock: 18, // Remaining stock
+        maxStock: 25, // Maximum stock capacity
+        isLowStock: false, // Flag for low stock
+        details: [
+          'Mini Cheeseburgers (6 pieces)',
+          'Chicken Nuggets with BBQ sauce',
+          'Juice Boxes (assorted flavors)',
+          'Colorful Cupcakes with sprinkles',
+          'Small Toys or activity packs',
+          'Fruit Skewers with yogurt dip',
+          'Veggie Sticks with ranch dressing',
+          'Party hats and decorations'
+        ]
+      },
+      { 
+        id: 'corporate-lunch',
+        name: 'Corporate Lunch Package', 
+        price: 12750, // Sale price
+        originalPrice: 15000,
+        category: 'team',
+        pax: 12,
+        description: 'Professional catering solution for business meetings, corporate events, or office celebrations.',
+        imageColor: 'from-gray-100 to-slate-100',
+        icon: 'fa-briefcase',
+        iconColor: 'text-gray-300',
+        rating: 4.7,
+        reviews: 1876,
+        isCertified: true,
+        stock: 5, // Remaining stock
+        maxStock: 10, // Maximum stock capacity
+        isLowStock: true, // Flag for low stock
+        details: [
+          'Sandwich Platter with 4 varieties',
+          'Mixed Salads with dressings',
+          'Fresh Fruit Tray',
+          'Bottled Water (still and sparkling)',
+          'Assorted Cookies and pastries',
+          'Coffee and tea service',
+          'Pilau rice ',
+          'Vegetable curry',
+          'Ugali and stewed beef',
+          'Professional serving utensils'          
+        ]
+      }
+    ];
+    
+    // Calculate discount percentage
+    function calculateDiscount(price, originalPrice) {
+      return Math.round(((originalPrice - price) / originalPrice) * 100);
+    }
+    
+    // Calculate stock percentage
+    function calculateStockPercentage(stock, maxStock) {
+      return Math.round((stock / maxStock) * 100);
+    }
+    
+    // Get stock status
+    function getStockStatus(product) {
+      if (product.isOutOfStock) {
+        return {
+          status: 'out-of-stock',
+          message: 'Out of Stock',
+          color: 'bg-red-100 text-red-800',
+          icon: 'fas fa-times-circle',
+          badgeColor: 'bg-red-500'
+        };
+      } else if (product.isLowStock || product.stock <= 5) {
+        return {
+          status: 'low-stock',
+          message: `Low Stock - Only ${product.stock} left`,
+          color: 'bg-yellow-100 text-yellow-800',
+          icon: 'fas fa-exclamation-triangle',
+          badgeColor: 'bg-yellow-500'
+        };
+      } else if (product.stock >= 10) {
+        return {
+          status: 'in-stock',
+          message: `In Stock - ${product.stock} available`,
+          color: 'bg-green-100 text-green-800',
+          icon: 'fas fa-check-circle',
+          badgeColor: 'bg-green-500'
+        };
+      } else {
+        return {
+          status: 'in-stock',
+          message: `In Stock - ${product.stock} available`,
+          color: 'bg-green-100 text-green-800',
+          icon: 'fas fa-check-circle',
+          badgeColor: 'bg-green-500'
+        };
+      }
+    }
+    
+    // Render products with enhanced features
+    function renderProducts(products) {
+      const container = document.getElementById('productsGrid');
+      if (!container) return;
+      
+      container.innerHTML = products.map(product => {
+        const discount = calculateDiscount(product.price, product.originalPrice);
+        const stockPercentage = calculateStockPercentage(product.stock, product.maxStock);
+        const stockStatus = getStockStatus(product);
+        const discountBadge = discount > 0 ? `
+          <div class="absolute top-3 left-3 sale-badge bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+            ${discount}% OFF
+          </div>
+        ` : '';
+        
+        // Stock badge (positioned on the right side)
+        const stockBadge = product.isOutOfStock ? `
+          <div class="absolute top-3 right-3 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+            <i class="fas fa-times-circle mr-1"></i> Sold Out
+          </div>
+        ` : product.isLowStock || product.stock <= 5 ? `
+          <div class="absolute top-3 right-3 low-stock-badge bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+            <i class="fas fa-exclamation-triangle mr-1"></i> Low Stock
+          </div>
+        ` : '';
+        
+        return `
+        <div class="product-card bg-white rounded-xl shadow p-5 flex flex-col relative" data-category="${product.category}">
+          ${discountBadge}
+          ${stockBadge}
+          
+          <!-- Product Image -->
+          <div class="aspect-video rounded-lg bg-gradient-to-r ${product.imageColor} flex items-center justify-center mb-4">
+            <i class="fas ${product.icon} text-4xl ${product.iconColor}"></i>
+          </div>
+          
+          <!-- Product Title and Trust Signals -->
+          <h3 class="text-xl font-bold text-gray-800 mb-1">${product.name}</h3>
+          
+          <!-- Trust Signals -->
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <div class="flex items-center">
+                <div class="flex text-yellow-400 text-sm">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="${product.rating >= 4.5 ? 'fas fa-star-half-alt' : 'far fa-star'}"></i>
+                </div>
+                <span class="ml-1 text-sm font-medium text-gray-700">${product.rating}</span>
+                <span class="mx-1 text-gray-400">•</span>
+                <span class="text-xs text-gray-600">${product.reviews.toLocaleString()}</span>
+              </div>
+            </div>
+            ${product.isCertified ? `
+              <div class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
+                <i class="fas fa-check-circle"></i>
+                <span>Certified</span>
+              </div>
+            ` : ''}
+          </div>
+          
+          <!-- Pax and Category -->
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-xs font-medium bg-teal-100 text-teal-700 px-2 py-1 rounded">${product.pax} pax</span>
+            <span class="text-xs font-medium bg-gray-100 text-gray-700 px-2 py-1 rounded">${product.category}</span>
+          </div>
+          
+          <!-- Product Description -->
+          <p class="text-gray-600 text-sm mb-4 flex-grow">${product.description}</p>
+          
+          <!-- Stock Information -->
+          <div class="mb-4">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2 ${stockStatus.color} px-3 py-2 rounded-lg">
+                <i class="${stockStatus.icon}"></i>
+                <span class="text-sm font-medium">${stockStatus.message}</span>
+              </div>
+              ${!product.isOutOfStock ? `
+                <div class="text-xs text-gray-500">
+                  ${product.stock} of ${product.maxStock} remaining
+                </div>
+              ` : ''}
+            </div>
+            
+            <!-- Stock Progress Bar -->
+            ${!product.isOutOfStock ? `
+              <div class="w-full bg-gray-200 rounded-full h-2 mb-1">
+                <div class="h-2 rounded-full ${stockStatus.badgeColor}" style="width: ${stockPercentage}%"></div>
+              </div>
+              <div class="flex justify-between text-xs text-gray-500">
+                <span>${stockPercentage}% available</span>
+                <span>${product.maxStock - product.stock} sold</span>
+              </div>
+            ` : ''}
+          </div>
+          
+          <!-- Pricing Information -->
+          <div class="mb-4">
+            <div class="flex items-baseline gap-2 mb-1">
+              <span class="text-2xl font-bold ${product.isOutOfStock ? 'text-gray-500' : 'text-gray-800'}">KSh ${product.price.toLocaleString()}</span>
+              ${discount > 0 ? `
+                <span class="text-lg text-gray-500 line-through">KSh ${product.originalPrice.toLocaleString()}</span>
+                <span class="text-sm font-bold text-red-600 ml-auto">Save ${discount}%</span>
+              ` : ''}
+            </div>
+            <p class="text-xs text-gray-500">Inclusive of all taxes</p>
+          </div>
+          
+          <!-- Quantity Selector -->
+          ${!product.isOutOfStock ? `
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Quantity:</label>
+              <div class="flex items-center gap-2">
+                <button class="quantity-btn w-8 h-8 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-50 ${product.stock <= 1 ? 'opacity-50 cursor-not-allowed' : ''}" data-id="${product.id}" data-action="decrease" ${product.stock <= 1 ? 'disabled' : ''}>
+                  <i class="fas fa-minus text-xs"></i>
+                </button>
+                <span class="w-10 text-center font-medium quantity-display" data-id="${product.id}">1</span>
+                <button class="quantity-btn w-8 h-8 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-50 ${product.stock <= 1 ? 'opacity-50 cursor-not-allowed' : ''}" data-id="${product.id}" data-action="increase" ${product.stock <= 1 ? 'disabled' : ''}>
+                  <i class="fas fa-plus text-xs"></i>
+                </button>
+                <span class="text-xs text-gray-500 ml-2">Max 3</span>
+              </div>
+              ${product.stock < 3 ? `
+                <div class="mt-2 text-xs text-yellow-600">
+                  <i class="fas fa-info-circle"></i> Limited to ${product.stock} per customer
+                </div>
+              ` : ''}
+            </div>
+          ` : `
+            <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-bell text-red-500"></i>
+                <span class="text-sm font-medium text-red-700">Out of stock - Check back soon!</span>
+              </div>
+            </div>
+          `}
+          
+          <!-- Delivery Estimate -->
+          ${!product.isOutOfStock ? `
+            <div class="mb-4 p-3 bg-gray-50 rounded-lg delivery-estimate">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-truck text-gray-400"></i>
+                  <div>
+                    <div class="text-sm font-medium text-gray-800">Standard Delivery</div>
+                    <div class="text-xs text-gray-600">3-5 hours • Free above KSh 5,000</div>
+                  </div>
+                </div>
+                <div class="text-sm font-bold ${product.price >= 5000 ? 'text-teal-600' : 'text-gray-800'}">
+                  ${product.price >= 5000 ? 'FREE' : 'KSh 250'}
+                </div>
+              </div>
+            </div>
+          ` : ''}
+          
+          <!-- Action Buttons -->
+          <div class="space-y-2">
+            <button class="view-details-btn w-full ${product.isOutOfStock ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} text-white px-4 py-3 rounded-lg font-medium" data-id="${product.id}" ${product.isOutOfStock ? 'disabled' : ''}>
+              <i class="fas fa-info-circle mr-2"></i> ${product.isOutOfStock ? 'View Details' : 'View Details'}
+            </button>
+            ${!product.isOutOfStock ? `
+              <div class="grid grid-cols-2 gap-2">
+                <button class="add-to-cart-btn bg-teal-600 hover:bg-teal-700 text-white px-4 py-3 rounded-lg font-medium" data-id="${product.id}">
+                  <i class="fas fa-shopping-cart mr-2"></i> Add to Cart
+                </button>
+                <button class="buy-now-btn bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-3 rounded-lg font-medium" data-id="${product.id}">
+                  <i class="fas fa-bolt mr-2"></i> Buy Now
+                </button>
+              </div>
+            ` : `
+              <button class="w-full bg-gray-100 text-gray-700 px-4 py-3 rounded-lg font-medium cursor-not-allowed" disabled>
+                <i class="fas fa-bell mr-2"></i> Notify When Available
+              </button>
+            `}
+          </div>
+        </div>
+        `;
+      }).join('');
+      
+      // Add event listeners
+      setupProductEventListeners();
+    }
+    
+    // Setup all product event listeners
+    function setupProductEventListeners() {
+      // Quantity buttons
+      document.querySelectorAll('.quantity-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+          const productId = e.target.closest('button').dataset.id;
+          const action = e.target.closest('button').dataset.action;
+          updateQuantity(productId, action);
+        });
+      });
+      
+      // View Details buttons
+      document.querySelectorAll('.view-details-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+          const productId = e.target.closest('button').dataset.id;
+          showProductDetails(productId);
+        });
+      });
+      
+      // Add to Cart buttons
+      document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+          const productId = e.target.closest('button').dataset.id;
+          const quantity = getQuantity(productId);
+          addToCart(productId, quantity);
+        });
+      });
+      
+      // Buy Now buttons
+      document.querySelectorAll('.buy-now-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+          const productId = e.target.closest('button').dataset.id;
+          const quantity = getQuantity(productId);
+          buyNow(productId, quantity);
+        });
+      });
+    }
+    
+    // Quantity management
+    function updateQuantity(productId, action) {
+      const product = PRODUCTS.find(p => p.id === productId);
+      if (!product || product.isOutOfStock) return;
+      
+      const quantityDisplay = document.querySelector(`.quantity-display[data-id="${productId}"]`);
+      if (!quantityDisplay) return;
+      
+      let quantity = parseInt(quantityDisplay.textContent);
+      
+      if (action === 'increase' && quantity < 3 && quantity < product.stock) {
+        quantity++;
+      } else if (action === 'decrease' && quantity > 1) {
+        quantity--;
+      }
+      
+      quantityDisplay.textContent = quantity;
+    }
+    
+    function getQuantity(productId) {
+      const quantityDisplay = document.querySelector(`.quantity-display[data-id="${productId}"]`);
+      return quantityDisplay ? parseInt(quantityDisplay.textContent) : 1;
+    }
+    
+    // Show product details modal
+    function showProductDetails(productId) {
+      const product = PRODUCTS.find(p => p.id === productId);
+      if (!product) return;
+      
+      const discount = calculateDiscount(product.price, product.originalPrice);
+      const stockPercentage = calculateStockPercentage(product.stock, product.maxStock);
+      const stockStatus = getStockStatus(product);
+      
+      document.getElementById('modalTitle').textContent = product.name;
+      document.getElementById('modalProductName').textContent = product.name;
+      document.getElementById('modalDescription').textContent = product.description;
+      document.getElementById('modalPrice').textContent = `KSh ${product.price.toLocaleString()}`;
+      document.getElementById('modalOriginalPrice').textContent = `KSh ${product.originalPrice.toLocaleString()}`;
+      document.getElementById('modalDiscount').textContent = `${discount}% OFF`;
+      document.getElementById('modalRating').textContent = product.rating;
+      document.getElementById('modalReviews').textContent = `(${product.reviews.toLocaleString()} reviews)`;
+      document.getElementById('modalPax').textContent = `${product.pax} pax`;
+      document.getElementById('modalCategory').textContent = product.category;
+      document.getElementById('modalIcon').className = `fas ${product.icon} text-8xl ${product.iconColor}`;
+      
+      // Update stock information in modal
+      const stockInfoDiv = document.getElementById('modalStockInfo');
+      stockInfoDiv.innerHTML = `
+        <div class="mb-4 p-3 ${stockStatus.color} rounded-lg">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <i class="${stockStatus.icon}"></i>
+              <span class="font-medium">${stockStatus.message}</span>
+            </div>
+            ${!product.isOutOfStock ? `
+              <div class="text-sm text-gray-700">
+                ${product.stock} of ${product.maxStock} remaining
+              </div>
+            ` : ''}
+          </div>
+          ${!product.isOutOfStock ? `
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-1">
+              <div class="h-2 rounded-full ${stockStatus.badgeColor}" style="width: ${stockPercentage}%"></div>
+            </div>
+            <div class="flex justify-between text-sm text-gray-600">
+              <span>${stockPercentage}% available</span>
+              <span>${product.maxStock - product.stock} sold today</span>
+            </div>
+          ` : ''}
+        </div>
+      `;
+      
+      const ingredientsList = document.getElementById('modalIngredients');
+      ingredientsList.innerHTML = '';
+      product.details.forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'flex items-start gap-2 mb-1';
+        li.innerHTML = `<i class="fas fa-check text-green-500 mt-1"></i><span>${item}</span>`;
+        ingredientsList.appendChild(li);
+      });
+      
+      document.getElementById('productModal').style.display = 'flex';
+    }
+    
+    // Add to cart function
+    function addToCart(productId, quantity = 1) {
+      const product = PRODUCTS.find(p => p.id === productId);
+      if (!product || product.isOutOfStock) {
+        alert('This product is currently out of stock.');
+        return;
+      }
+      
+      if (quantity > product.stock) {
+        alert(`Only ${product.stock} items available in stock.`);
+        return;
+      }
+      
+      const cart = loadCart();
+      const existingItemIndex = cart.findIndex(item => item.id === productId);
+      
+      if (existingItemIndex > -1) {
+        const newQuantity = cart[existingItemIndex].quantity + quantity;
+        if (newQuantity > product.stock) {
+          alert(`Cannot add more than ${product.stock} items of this product to cart.`);
+          return;
+        }
+        cart[existingItemIndex].quantity = newQuantity;
+      } else {
+        cart.push({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          quantity: quantity,
+          category: product.category
+        });
+      }
+      
+      saveCart(cart);
+      showCartNotification(product.name, quantity);
+    }
+    
+    // Buy Now function
+    function buyNow(productId, quantity = 1) {
+      const product = PRODUCTS.find(p => p.id === productId);
+      if (!product || product.isOutOfStock) {
+        alert('This product is currently out of stock.');
+        return;
+      }
+      
+      if (quantity > product.stock) {
+        alert(`Only ${product.stock} items available in stock.`);
+        return;
+      }
+      
+      addToCart(productId, quantity);
+      setTimeout(() => {
+        window.location.href = 'cart.html';
+      }, 500);
+    }
+    
+    // Show cart notification
+    function showCartNotification(productName, quantity) {
+      const notification = document.getElementById('cartNotification');
+      const title = document.getElementById('notificationTitle');
+      const message = document.getElementById('notificationMessage');
+      
+      title.textContent = 'Added to cart!';
+      message.textContent = `${quantity}x ${productName}`;
+      
+      notification.classList.remove('hidden');
+      
+      setTimeout(() => {
+        notification.classList.add('hidden');
+      }, 3000);
+    }
+    
+    // Filter and sort products
+    function filterAndSortProducts() {
+      const selectedCategories = Array.from(document.querySelectorAll('input[data-category]:checked'))
+        .map(input => input.dataset.category)
+        .filter(category => category !== 'all');
+      
+      const sortBy = document.getElementById('sortSelect').value;
+      
+      let filteredProducts = [...PRODUCTS];
+      
+      // Apply category filter
+      if (selectedCategories.length > 0 && !selectedCategories.includes('all')) {
+        filteredProducts = filteredProducts.filter(product => 
+          selectedCategories.includes(product.category)
+        );
+      }
+      
+      // Apply sorting
+      switch (sortBy) {
+        case 'price-low':
+          filteredProducts.sort((a, b) => a.price - b.price);
+          break;
+        case 'price-high':
+          filteredProducts.sort((a, b) => b.price - a.price);
+          break;
+        case 'stock-high':
+          // Sort by stock (high to low)
+          filteredProducts.sort((a, b) => {
+            // Out of stock items go to the bottom
+            if (a.isOutOfStock && !b.isOutOfStock) return 1;
+            if (!a.isOutOfStock && b.isOutOfStock) return -1;
+            return b.stock - a.stock;
+          });
+          break;
+        case 'popular':
+          // Sort by rating and reviews
+          filteredProducts.sort((a, b) => {
+            const scoreA = a.rating * 100 + a.reviews / 100;
+            const scoreB = b.rating * 100 + b.reviews / 100;
+            return scoreB - scoreA;
+          });
+          break;
+        default:
+          // Featured order - show discounted items first, then in-stock items
+          filteredProducts.sort((a, b) => {
+            // Out of stock items go to the bottom
+            if (a.isOutOfStock && !b.isOutOfStock) return 1;
+            if (!a.isOutOfStock && b.isOutOfStock) return -1;
+            
+            // Then sort by discount percentage
+            const discountA = calculateDiscount(a.price, a.originalPrice);
+            const discountB = calculateDiscount(b.price, b.originalPrice);
+            return discountB - discountA;
+          });
+          break;
+      }
+      
+      renderProducts(filteredProducts);
+    }
+    
+    // Mobile Menu
+    document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.add('open');
+    });
+    
+    document.getElementById('closeMobileMenu')?.addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.remove('open');
+    });
+    
+    // Close notification
+    document.getElementById('closeNotification')?.addEventListener('click', () => {
+      document.getElementById('cartNotification').classList.add('hidden');
+    });
+    
+    // Close modal
+    document.getElementById('closeModal')?.addEventListener('click', () => {
+      document.getElementById('productModal').style.display = 'none';
+    });
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', (e) => {
+      const modal = document.getElementById('productModal');
+      if (e.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      updateCartCount();
+      
+      // Highlight current page in nav
+      const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+      document.querySelectorAll('.nav-link').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href === currentPage) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+      
+      // Initial render
+      renderProducts(PRODUCTS);
+      
+      // Set up filter event listeners
+      document.querySelectorAll('input[data-category]').forEach(input => {
+        input.addEventListener('change', filterAndSortProducts);
+      });
+      
+      document.getElementById('sortSelect').addEventListener('change', filterAndSortProducts);
+      
+      // Handle "all" checkbox
+      const allCheckbox = document.querySelector('input[data-category="all"]');
+      const otherCheckboxes = document.querySelectorAll('input[data-category]:not([data-category="all"])');
+      
+      allCheckbox.addEventListener('change', (e) => {
+        if (e.target.checked) {
+          otherCheckboxes.forEach(cb => cb.checked = false);
+          filterAndSortProducts();
+        }
+      });
+      
+      otherCheckboxes.forEach(cb => {
+        cb.addEventListener('change', (e) => {
+          if (e.target.checked) {
+            allCheckbox.checked = false;
+            filterAndSortProducts();
+          }
+        });
+      });
+      
+      // Close mobile menu when clicking outside
+      document.addEventListener('click', (e) => {
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuBtn = document.getElementById('mobileMenuBtn');
+        
+        if (mobileMenu.classList.contains('open') && 
+            !mobileMenu.contains(e.target) && 
+            e.target !== menuBtn && 
+            !menuBtn.contains(e.target)) {
+          mobileMenu.classList.remove('open');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

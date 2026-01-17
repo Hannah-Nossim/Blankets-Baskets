@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<!-- index.html - Homepage -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Blankets & Baskets — Shop Picnic Kits</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    body { 
+      font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+      min-height: 100vh;
+    }
+    .product-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    .category-filter label {
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .category-filter input:checked + span {
+      background-color: #0d9488;
+      color: white;
+      border-color: #0d9488;
+    }
+    .nav-link {
+      position: relative;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -4px;
+      left: 0;
+      background-color: #0d9488;
+      transition: width 0.3s ease;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    .nav-link.active::after {
+      width: 100%;
+    }
+    .hero-gradient {
+      background: linear-gradient(135deg, #ccfbf1 0%, #f0f9ff 100%);
+    }
+    .cart-notification {
+      animation: slideIn 0.3s ease-out;
+    }
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    .mobile-menu {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+    .mobile-menu.open {
+      transform: translateX(0);
+    }
+    .quantity-btn {
+      transition: all 0.2s ease;
+    }
+    .quantity-btn:hover {
+      background-color: #f3f4f6;
+    }
+    .add-to-cart-btn {
+      transition: all 0.3s ease;
+    }
+    .add-to-cart-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+    }
+    .payment-method {
+      transition: all 0.2s ease;
+    }
+    .payment-method:hover {
+      border-color: #0d9488;
+      background-color: #f0f9ff;
+    }
+    .payment-method.selected {
+      border-color: #0d9488;
+      background-color: #f0f9ff;
+    }
+    .step-indicator {
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background-color: #e5e7eb;
+      color: #6b7280;
+      font-weight: 600;
+    }
+    .step-indicator.active {
+      background-color: #0d9488;
+      color: white;
+    }
+    .step-indicator.completed {
+      background-color: #10b981;
+      color: white;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Header -->
+  <header class="bg-white shadow sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 py-3">
+      <div class="flex items-center justify-between">
+        <!-- Logo and Mobile Menu Button -->
+        <div class="flex items-center gap-4">
+          <button id="mobileMenuBtn" class="md:hidden text-gray-700">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+          <a href="index.html" class="text-2xl font-extrabold text-teal-600">blankets &amp; baskets</a>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:block">
+          <ul class="flex items-center gap-6 text-gray-700">
+            <li><a href="index.html" class="nav-link hover:text-teal-600 active">Home</a></li>
+            <li><a href="products.html" class="nav-link hover:text-teal-600">Products</a></li>
+            <li><a href="custom-basket.html" class="nav-link hover:text-teal-600">Custom Basket</a></li>
+            <li><a href="add-ons.html" class="nav-link hover:text-teal-600">Add-ons</a></li>
+            <li><a href="cart.html" class="nav-link hover:text-teal-600">Cart</a></li>
+            <li><a href="login.html" class="nav-link hover:text-teal-600">Login</a></li>
+            <li><a href="register.html" class="nav-link hover:text-teal-600">Register</a></li>
+          </ul>
+        </nav>
+
+        <!-- Cart Icon -->
+        <div class="flex items-center gap-4">
+          <a href="cart.html" id="cartLink" class="relative text-gray-700">
+            <i class="fas fa-shopping-cart text-xl"></i>
+            <span id="cartCount" class="absolute -top-2 -right-3 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Menu -->
+  <div id="mobileMenu" class="mobile-menu fixed inset-0 z-40 bg-white w-64 p-6 md:hidden">
+    <div class="flex justify-between items-center mb-8">
+      <div class="text-xl font-extrabold text-teal-600">blankets &amp; baskets</div>
+      <button id="closeMobileMenu" class="text-gray-700">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+    <nav>
+      <ul class="space-y-4 text-gray-700">
+        <li><a href="index.html" class="block py-2 hover:text-teal-600 text-lg">Home</a></li>
+        <li><a href="products.html" class="block py-2 hover:text-teal-600 text-lg">Products</a></li>
+        <li><a href="custom-basket.html" class="block py-2 hover:text-teal-600 text-lg">Custom Basket</a></li>
+        <li><a href="add-ons.html" class="block py-2 hover:text-teal-600 text-lg">Add-ons</a></li>
+        <li><a href="cart.html" class="block py-2 hover:text-teal-600 text-lg">Cart</a></li>
+      <li><a href="login.html" class="block py-2 hover:text-teal-600 text-lg">Login</a></li>
+    <li><a href="register.html" class="block py-2 hover:text-teal-600 text-lg">Register</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero-gradient py-12 md:py-20">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex flex-col md:flex-row items-center gap-8">
+        <div class="flex-1 text-center md:text-left">
+          <h1 class="text-4xl md:text-5xl font-extrabold text-teal-800 mb-4">Shop Picnic Kits</h1>
+          <p class="text-gray-700 text-lg md:text-xl mb-6 max-w-2xl">Ready-to-eat meal kits curated for outdoor moments — easy online ordering and secure payments via M-Pesa.</p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+            <a href="#featured" class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-lg font-medium transition duration-300">Shop Now</a>
+            <a href="custom-basket.html" class="bg-white hover:bg-gray-50 text-teal-600 border border-teal-600 px-6 py-3 rounded-lg font-medium transition duration-300">Build Custom Basket</a>
+          </div>
+        </div>
+        <div class="flex-1">
+          <div class="bg-white rounded-xl shadow-lg p-6 max-w-md mx-auto">
+            <div class="aspect-video rounded-lg bg-gradient-to-r from-teal-100 to-teal-50 flex items-center justify-center mb-4">
+              <i class="fas fa-basket-shopping text-5xl text-teal-300"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Why Choose Us?</h3>
+            <ul class="space-y-2 text-gray-600">
+              <li class="flex items-center gap-2"><i class="fas fa-check text-teal-500"></i> Fresh, locally sourced ingredients</li>
+              <li class="flex items-center gap-2"><i class="fas fa-check text-teal-500"></i> Ready in 24 hours</li>
+              <li class="flex items-center gap-2"><i class="fas fa-check text-teal-500"></i> Free delivery in Nairobi</li>
+              <li class="flex items-center gap-2"><i class="fas fa-check text-teal-500"></i> Secure M-Pesa payments</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Topic 8: Brand Identity & Differentiation Section -->
+  <section class="bg-white py-12 md:py-16">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="text-center mb-10">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-3">The Blankets & Baskets Promise</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">We're not just delivering food—we're creating memorable outdoor experiences</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Promise 1: Freshness & Quality -->
+        <div class="text-center p-6 rounded-xl bg-gradient-to-br from-teal-50 to-teal-100 border border-teal-200">
+          <div class="w-16 h-16 bg-teal-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-leaf text-2xl text-white"></i>
+          </div>
+          <h3 class="text-xl font-bold text-teal-800 mb-2">Fresh, Locally-Sourced Ingredients</h3>
+          <p class="text-gray-600">All our ingredients are sourced from trusted local suppliers. Prepared fresh on the day of delivery for peak flavor and quality.</p>
+        </div>
+
+        <!-- Promise 2: Convenience & Experience -->
+        <div class="text-center p-6 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200">
+          <div class="w-16 h-16 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-magic text-2xl text-white"></i>
+          </div>
+          <h3 class="text-xl font-bold text-amber-800 mb-2">Ready for Memorable Moments</h3>
+          <p class="text-gray-600">No planning, no prep, no cleanup. Just open your basket and enjoy. We handle everything so you can focus on making memories.</p>
+        </div>
+
+        <!-- Promise 3: Sustainability & Craftsmanship -->
+        <div class="text-center p-6 rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200">
+          <div class="w-16 h-16 bg-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-recycle text-2xl text-white"></i>
+          </div>
+          <h3 class="text-xl font-bold text-emerald-800 mb-2">Sustainable & Thoughtfully Crafted</h3>
+          <p class="text-gray-600">Eco-friendly packaging, reusable items when possible, and a commitment to reducing waste while maximizing your picnic enjoyment.</p>
+        </div>
+      </div>
+      
+      <!-- Trust Badges -->
+      <div class="mt-12 pt-8 border-t border-gray-200">
+        <div class="flex flex-wrap justify-center gap-6">
+          <div class="flex items-center gap-2">
+            <i class="fas fa-clock text-teal-600"></i>
+            <span class="text-sm text-gray-700">24-hour preparation</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="fas fa-truck text-teal-600"></i>
+            <span class="text-sm text-gray-700">Free Nairobi delivery</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="fas fa-shield-alt text-teal-600"></i>
+            <span class="text-sm text-gray-700">Secure M-Pesa payments</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="fas fa-star text-teal-600"></i>
+            <span class="text-sm text-gray-700">Rated 4.8/5 by customers</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products -->
+<section id="featured" class="py-12 md:py-16">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="text-center mb-10">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-3">Featured Picnic Kits</h2>
+      <p class="text-gray-600 max-w-2xl mx-auto">Perfectly curated for every occasion</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Product 1: Classic Couple Kit -->
+      <div class="product-card bg-white rounded-xl shadow p-5 relative">
+        <div class="absolute top-3 left-3 sale-badge bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+          15% OFF
+        </div>
+        <div class="absolute top-3 right-3 low-stock-badge bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+          <i class="fas fa-exclamation-triangle mr-1"></i> Low Stock
+        </div>
+        
+        <div class="aspect-video rounded-lg bg-gradient-to-r from-amber-100 to-orange-100 flex items-center justify-center mb-4">
+          <i class="fas fa-heart text-4xl text-amber-300"></i>
+        </div>
+        
+        <!-- Trust Signals -->
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <div class="flex items-center">
+              <div class="flex text-yellow-400 text-sm">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+              </div>
+              <span class="ml-1 text-sm font-medium text-gray-700">4.5</span>
+              <span class="mx-1 text-gray-400">•</span>
+              <span class="text-xs text-gray-600">892</span>
+            </div>
+          </div>
+          <div class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
+            <i class="fas fa-check-circle"></i>
+            <span>Certified</span>
+          </div>
+        </div>
+        
+        <h3 class="text-xl font-bold text-gray-800 mb-1">Classic Couple Kit</h3>
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-xs font-medium bg-teal-100 text-teal-700 px-2 py-1 rounded">2 pax</span>
+          <span class="text-xs font-medium bg-gray-100 text-gray-700 px-2 py-1 rounded">couple</span>
+        </div>
+        <p class="text-gray-600 text-sm mb-4">Perfect for romantic outings or casual dates. This kit includes all the essentials for a delightful picnic experience for two.</p>
+        
+        <!-- Stock Information -->
+        <div class="mb-4">
+          <div class="flex items-center gap-2 bg-yellow-100 text-yellow-800 px-3 py-2 rounded-lg mb-2">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span class="text-sm font-medium">Low Stock - Only 15 left</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2 mb-1">
+            <div class="h-2 rounded-full bg-yellow-500" style="width: 75%"></div>
+          </div>
+          <div class="flex justify-between text-xs text-gray-500">
+            <span>75% available</span>
+            <span>5 sold</span>
+          </div>
+        </div>
+        
+        <!-- Pricing -->
+        <div class="mb-4">
+          <div class="flex items-baseline gap-2 mb-1">
+            <span class="text-2xl font-bold text-gray-800">KSh 1,700</span>
+            <span class="text-lg text-gray-500 line-through">KSh 2,000</span>
+            <span class="text-sm font-bold text-red-600 ml-auto">Save 15%</span>
+          </div>
+          <p class="text-xs text-gray-500">Inclusive of all taxes</p>
+        </div>
+        
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+              <i class="fas fa-truck"></i>
+              <span>Free delivery</span>
+            </div>
+          </div>
+          <button class="add-to-cart-btn bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg font-medium" data-id="classic-couple">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+
+      <!-- Product 2: Family Fun Kit - Premium Edition -->
+      <div class="product-card bg-white rounded-xl shadow p-5 relative">
+        <div class="absolute top-3 left-3 sale-badge bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+          15% OFF
+        </div>
+        <div class="absolute top-3 right-3 low-stock-badge bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+          <i class="fas fa-exclamation-triangle mr-1"></i> Low Stock
+        </div>
+        
+        <div class="aspect-video rounded-lg bg-gradient-to-r from-blue-100 to-cyan-100 flex items-center justify-center mb-4">
+          <i class="fas fa-users text-4xl text-blue-300"></i>
+        </div>
+        
+        <!-- Trust Signals -->
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <div class="flex items-center">
+              <div class="flex text-yellow-400 text-sm">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+              </div>
+              <span class="ml-1 text-sm font-medium text-gray-700">4.7</span>
+              <span class="mx-1 text-gray-400">•</span>
+              <span class="text-xs text-gray-600">1,248</span>
+            </div>
+          </div>
+          <div class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
+            <i class="fas fa-check-circle"></i>
+            <span>Certified</span>
+          </div>
+        </div>
+        
+        <h3 class="text-xl font-bold text-gray-800 mb-1">Family Fun Kit - Premium Edition</h3>
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-xs font-medium bg-teal-100 text-teal-700 px-2 py-1 rounded">5 pax</span>
+          <span class="text-xs font-medium bg-gray-100 text-gray-700 px-2 py-1 rounded">family</span>
+        </div>
+        <p class="text-gray-600 text-sm mb-4">The ultimate family picnic solution with diverse food options that cater to both kids and adults. Perfect for birthdays and family gatherings.</p>
+        
+        <!-- Stock Information -->
+        <div class="mb-4">
+          <div class="flex items-center gap-2 bg-yellow-100 text-yellow-800 px-3 py-2 rounded-lg mb-2">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span class="text-sm font-medium">Low Stock - Only 8 left</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2 mb-1">
+            <div class="h-2 rounded-full bg-yellow-500" style="width: 32%"></div>
+          </div>
+          <div class="flex justify-between text-xs text-gray-500">
+            <span>32% available</span>
+            <span>17 sold</span>
+          </div>
+        </div>
+        
+        <!-- Pricing -->
+        <div class="mb-4">
+          <div class="flex items-baseline gap-2 mb-1">
+            <span class="text-2xl font-bold text-gray-800">KSh 3,655</span>
+            <span class="text-lg text-gray-500 line-through">KSh 4,300</span>
+            <span class="text-sm font-bold text-red-600 ml-auto">Save 15%</span>
+          </div>
+          <p class="text-xs text-gray-500">Inclusive of all taxes</p>
+        </div>
+        
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+              <i class="fas fa-truck"></i>
+              <span>Free delivery</span>
+            </div>
+          </div>
+          <button class="add-to-cart-btn bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg font-medium" data-id="family-fun">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+
+      <!-- Product 3: Choma Box - Grill Master -->
+      <div class="product-card bg-white rounded-xl shadow p-5 relative">
+        <div class="absolute top-3 left-3 sale-badge bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+          15% OFF
+        </div>
+        
+        <div class="aspect-video rounded-lg bg-gradient-to-r from-red-100 to-orange-100 flex items-center justify-center mb-4">
+          <i class="fas fa-fire text-4xl text-red-300"></i>
+        </div>
+        
+        <!-- Trust Signals -->
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <div class="flex items-center">
+              <div class="flex text-yellow-400 text-sm">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+              </div>
+              <span class="ml-1 text-sm font-medium text-gray-700">4.6</span>
+              <span class="mx-1 text-gray-400">•</span>
+              <span class="text-xs text-gray-600">1,048</span>
+            </div>
+          </div>
+          <div class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
+            <i class="fas fa-check-circle"></i>
+            <span>Certified</span>
+          </div>
+        </div>
+        
+        <h3 class="text-xl font-bold text-gray-800 mb-1">Choma Box - Grill Master</h3>
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-xs font-medium bg-teal-100 text-teal-700 px-2 py-1 rounded">5 pax</span>
+          <span class="text-xs font-medium bg-gray-100 text-gray-700 px-2 py-1 rounded">choma</span>
+        </div>
+        <p class="text-gray-600 text-sm mb-4">Authentic Kenyan grill experience perfect for outdoor gatherings and celebrations. Comes with traditional accompaniments.</p>
+        
+        <!-- Stock Information -->
+        <div class="mb-4">
+          <div class="flex items-center gap-2 bg-green-100 text-green-800 px-3 py-2 rounded-lg mb-2">
+            <i class="fas fa-check-circle"></i>
+            <span class="text-sm font-medium">In Stock - 22 available</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2 mb-1">
+            <div class="h-2 rounded-full bg-green-500" style="width: 73%"></div>
+          </div>
+          <div class="flex justify-between text-xs text-gray-500">
+            <span>73% available</span>
+            <span>8 sold</span>
+          </div>
+        </div>
+        
+        <!-- Pricing -->
+        <div class="mb-4">
+          <div class="flex items-baseline gap-2 mb-1">
+            <span class="text-2xl font-bold text-gray-800">KSh 5,525</span>
+            <span class="text-lg text-gray-500 line-through">KSh 6,500</span>
+            <span class="text-sm font-bold text-red-600 ml-auto">Save 15%</span>
+          </div>
+          <p class="text-xs text-gray-500">Inclusive of all taxes</p>
+        </div>
+        
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+              <i class="fas fa-truck"></i>
+              <span>Free delivery</span>
+            </div>
+          </div>
+          <button class="add-to-cart-btn bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg font-medium" data-id="choma-box">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-10">
+      <a href="products.html" class="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium">
+        View All Products <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+  <!-- How It Works -->
+  <section class="py-12 md:py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="text-center mb-10">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-3">How It Works</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">Get your perfect picnic kit in 3 simple steps</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Step 1 -->
+        <div class="text-center">
+          <div class="step-indicator active mx-auto mb-4">1</div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Choose Your Kit</h3>
+          <p class="text-gray-600">Browse our selection of pre-made picnic kits or build your own custom basket.</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="text-center">
+          <div class="step-indicator mx-auto mb-4">2</div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Customize & Order</h3>
+          <p class="text-gray-600">Add extras, select delivery time, and proceed to checkout.</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="text-center">
+          <div class="step-indicator mx-auto mb-4">3</div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Pay & Enjoy</h3>
+          <p class="text-gray-600">Pay securely via M-Pesa and enjoy your picnic within 24 hours.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-12 md:py-16 bg-teal-700">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Ready for Your Perfect Picnic?</h2>
+      <p class="text-teal-100 text-lg mb-8 max-w-2xl mx-auto">Create unforgettable outdoor moments with our curated picnic kits.</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="products.html" class="bg-white hover:bg-gray-100 text-teal-700 px-8 py-3 rounded-lg font-medium text-lg transition duration-300">Shop All Kits</a>
+        <a href="custom-basket.html" class="bg-transparent hover:bg-teal-600 text-white border-2 border-white px-8 py-3 rounded-lg font-medium text-lg transition duration-300">Build Custom Basket</a>
+      </div>
+    </div>
+  </section>
+
+    <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-12">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <!-- Company Info -->
+        <div>
+          <div class="text-2xl font-extrabold text-teal-400 mb-4">blankets &amp; baskets</div>
+          <p class="text-gray-300">Fresh picnic kits for memorable outdoor moments.</p>
+          <div class="flex gap-4 mt-4">
+            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook text-xl"></i></a>
+            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-instagram text-xl"></i></a>
+            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter text-xl"></i></a>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div>
+          <h4 class="text-lg font-bold mb-4">Quick Links</h4>
+          <ul class="space-y-2">
+            <li><a href="index.html" class="text-gray-300 hover:text-white">Home</a></li>
+            <li><a href="products.html" class="text-gray-300 hover:text-white">Products</a></li>
+            <li><a href="custom-basket.html" class="text-gray-300 hover:text-white">Custom Basket</a></li>
+            <li><a href="add-ons.html" class="text-gray-300 hover:text-white">Add-ons</a></li>
+            <li><a href="register.html" class="text-gray-300 hover:text-white">Register</a></li>
+            <li><a href="login.html" class="text-gray-300 hover:text-white">Login</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact -->
+        <div>
+          <h4 class="text-lg font-bold mb-4">Contact</h4>
+          <ul class="space-y-2 text-gray-300">
+            <li class="flex items-center gap-2"><i class="fas fa-phone"></i> +254 700 123 456</li>
+            <li class="flex items-center gap-2"><i class="fas fa-envelope"></i> hello@blanketsbaskets.co.ke</li>
+            <li class="flex items-center gap-2"><i class="fas fa-map-marker-alt"></i> Nairobi, Kenya</li>
+          </ul>
+        </div>
+
+        <!-- Payment Methods -->
+        <div>
+          <h4 class="text-lg font-bold mb-4">Payment Methods</h4>
+          <div class="flex flex-wrap gap-2">
+            <div class="bg-white text-gray-800 px-3 py-1 rounded text-sm font-medium">M-Pesa</div>
+            <div class="bg-white text-gray-800 px-3 py-1 rounded text-sm font-medium">Visa</div>
+            <div class="bg-white text-gray-800 px-3 py-1 rounded text-sm font-medium">Mastercard</div>
+          </div>
+          <p class="text-sm text-gray-400 mt-4">Secure payments guaranteed</p>
+          
+          <!-- Security Badges - Added -->
+          <div class="mt-4 flex flex-wrap gap-2">
+            <div class="bg-teal-600 text-white px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
+              <i class="fas fa-lock"></i>
+              <span>SSL Secured</span>
+            </div>
+            <div class="bg-teal-600 text-white px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
+              <i class="fas fa-shield-alt"></i>
+              <span>PCI DSS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legal & Compliance Section - Added -->
+      <div class="border-t border-gray-700 mt-8 pt-6">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="mb-4 md:mb-0">
+            <div class="flex flex-wrap gap-4 text-sm text-gray-400">
+              <a href="documents/Blankets_and_Baskets_Security_and_Privacy_Policy.pdf" class="hover:text-white">Privacy Policy</a>
+              <a href="#" class="hover:text-white">Terms of Service</a>
+              <a href="#" class="hover:text-white">Cookie Policy</a>
+              <a href="#" class="hover:text-white">Data Processing Agreement</a>
+              <a href="#" class="hover:text-white">Security Center</a>
+            </div>
+          </div>
+          
+          <!-- Security Compliance Badges - Added -->
+          <div class="flex flex-wrap gap-3">
+            <div class="flex items-center gap-1 text-sm text-gray-400">
+              <i class="fas fa-user-shield text-teal-400"></i>
+              <span>GDPR Ready</span>
+            </div>
+            <div class="flex items-center gap-1 text-sm text-gray-400">
+              <i class="fas fa-check-circle text-teal-400"></i>
+              <span>ISO 27001</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-700 mt-6 pt-8 text-center text-gray-400">
+        <p>&copy; 2025 Blankets &amp; Baskets. All rights reserved.</p>
+        <p class="text-sm mt-2">Demo static mockup. M-Pesa integration via Safaricom Daraja API.</p>
+        
+        <!-- E-commerce Security Notice - Added -->
+        <div class="mt-4 text-xs text-gray-500 max-w-2xl mx-auto">
+          <p>This e-commerce platform implements six key dimensions of security: <span class="text-teal-300">Integrity</span>, <span class="text-teal-300">Non-repudiation</span>, <span class="text-teal-300">Authenticity</span>, <span class="text-teal-300">Confidentiality</span>, <span class="text-teal-300">Privacy</span>, and <span class="text-teal-300">Availability</span>.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cart Notification -->
+  <div id="cartNotification" class="fixed bottom-4 right-4 bg-teal-600 text-white p-4 rounded-lg shadow-lg cart-notification hidden max-w-sm">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <i class="fas fa-check-circle text-xl"></i>
+        <div>
+          <p class="font-medium" id="notificationTitle">Item added to cart</p>
+          <p class="text-sm text-teal-100" id="notificationMessage"></p>
+        </div>
+      </div>
+      <button id="closeNotification" class="text-teal-200 hover:text-white">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Cart Management
+    const CART_KEY = 'bb_cart_v2';
+    
+    // Initialize cart
+    function loadCart() {
+      try {
+        const cart = localStorage.getItem(CART_KEY);
+        return cart ? JSON.parse(cart) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+    
+    function saveCart(cart) {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+      updateCartCount();
+    }
+    
+    function updateCartCount() {
+      const cart = loadCart();
+      const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+      const cartCount = document.getElementById('cartCount');
+      if (cartCount) {
+        cartCount.textContent = total;
+        if (total > 0) {
+          cartCount.classList.remove('hidden');
+        } else {
+          cartCount.classList.add('hidden');
+        }
+      }
+    }
+    
+    // Product Data
+    const PRODUCTS = {
+      'classic-couple': { 
+        name: 'Classic Couple Kit', 
+        price: 1200, 
+        category: 'couple',
+        pax: 2
+      },
+      'family-fun': { 
+        name: 'Family Fun Kit', 
+        price: 3800, 
+        category: 'family',
+        pax: 5
+      },
+      'choma-box': { 
+        name: 'Choma Box', 
+        price: 4200, 
+        category: 'choma',
+        pax: 5
+      },
+      'vegan-chill': { 
+        name: 'Vegan Chill Pack', 
+        price: 3000, 
+        category: 'vegan',
+        pax: 5
+      },
+      'team-outing': { 
+        name: 'Team Outing Kit', 
+        price: 7500, 
+        category: 'team',
+        pax: 10
+      }
+    };
+    
+    // Add to cart function
+    function addToCart(productId, quantity = 1) {
+      const product = PRODUCTS[productId];
+      if (!product) return;
+      
+      const cart = loadCart();
+      const existingItemIndex = cart.findIndex(item => item.id === productId);
+      
+      if (existingItemIndex > -1) {
+        cart[existingItemIndex].quantity += quantity;
+      } else {
+        cart.push({
+          id: productId,
+          name: product.name,
+          price: product.price,
+          quantity: quantity,
+          category: product.category
+        });
+      }
+      
+      saveCart(cart);
+      showCartNotification(product.name, quantity);
+    }
+    
+    // Show cart notification
+    function showCartNotification(productName, quantity) {
+      const notification = document.getElementById('cartNotification');
+      const title = document.getElementById('notificationTitle');
+      const message = document.getElementById('notificationMessage');
+      
+      title.textContent = 'Added to cart!';
+      message.textContent = `${quantity}x ${productName}`;
+      
+      notification.classList.remove('hidden');
+      
+      setTimeout(() => {
+        notification.classList.add('hidden');
+      }, 3000);
+    }
+    
+    // Mobile Menu
+    document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.add('open');
+    });
+    
+    document.getElementById('closeMobileMenu')?.addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.remove('open');
+    });
+    
+    // Close notification
+    document.getElementById('closeNotification')?.addEventListener('click', () => {
+      document.getElementById('cartNotification').classList.add('hidden');
+    });
+    
+    // Add to cart buttons
+    document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const productId = e.target.dataset.id;
+        addToCart(productId, 1);
+      });
+    });
+    
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+      const mobileMenu = document.getElementById('mobileMenu');
+      const menuBtn = document.getElementById('mobileMenuBtn');
+      
+      if (mobileMenu.classList.contains('open') && 
+          !mobileMenu.contains(e.target) && 
+          e.target !== menuBtn && 
+          !menuBtn.contains(e.target)) {
+        mobileMenu.classList.remove('open');
+      }
+    });
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      updateCartCount();
+      
+      // Highlight current page in nav
+      const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+      document.querySelectorAll('.nav-link').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href === currentPage || (currentPage === '' && href === 'index.html')) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
