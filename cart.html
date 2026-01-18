@@ -112,6 +112,7 @@
             <li><a href="custom-basket.html" class="nav-link hover:text-teal-600">Custom Basket</a></li>
             <li><a href="add-ons.html" class="nav-link hover:text-teal-600">Add-ons</a></li>
             <li><a href="cart.html" class="nav-link hover:text-teal-600 active">Cart</a></li>
+            <li><a href="orders.html" class="nav-link hover:text-teal-600">My Orders</a></li>
           </ul>
         </nav>
 
@@ -141,6 +142,7 @@
         <li><a href="custom-basket.html" class="block py-2 hover:text-teal-600 text-lg">Custom Basket</a></li>
         <li><a href="add-ons.html" class="block py-2 hover:text-teal-600 text-lg">Add-ons</a></li>
         <li><a href="cart.html" class="block py-2 hover:text-teal-600 text-lg">Cart</a></li>
+        <li><a href="orders.html" class="block py-2 hover:text-teal-600 text-lg">My Orders</a></li>
       </ul>
     </nav>
   </div>
@@ -564,6 +566,7 @@
     // Cart Management
     const CART_KEY = 'bb_cart_v2';
     const DELIVERY_KEY = 'bb_delivery_info';
+    const ORDERS_KEY = 'bb_orders'; // NEW: Orders storage key
     
     // Delivery price mapping based on area
     const DELIVERY_PRICES = {
@@ -580,6 +583,57 @@
     
     // Free delivery threshold
     const FREE_DELIVERY_THRESHOLD = 5000;
+    
+    // NEW: Function to create and save orders
+    function createOrderFromCart(paymentMethod) {
+      const cart = loadCart();
+      const deliveryInfo = loadDeliveryInfo();
+      
+      if (cart.length === 0) return null;
+      
+      // Calculate totals
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const deliveryFee = calculateDeliveryFee(deliveryInfo.area, subtotal);
+      const total = subtotal + deliveryFee;
+      
+      // Create order object
+      const order = {
+        id: 'BB-' + Date.now().toString().slice(-6) + '-' + Math.random().toString(36).substr(2, 4).toUpperCase(),
+        date: new Date().toISOString(),
+        items: JSON.parse(JSON.stringify(cart)), // Deep copy
+        subtotal: subtotal,
+        deliveryFee: deliveryFee,
+        total: total,
+        paymentMethod: paymentMethod,
+        paymentStatus: 'paid',
+        deliveryInfo: JSON.parse(JSON.stringify(deliveryInfo)),
+        status: 'processing',
+        timeline: [
+          {
+            event: 'order_placed',
+            description: 'Order placed successfully',
+            timestamp: new Date().toISOString()
+          },
+          {
+            event: 'payment_confirmed',
+            description: 'Payment confirmed',
+            timestamp: new Date().toISOString()
+          },
+          {
+            event: 'order_processing',
+            description: 'Order is being processed',
+            timestamp: new Date().toISOString()
+          }
+        ]
+      };
+      
+      // Save to orders
+      const orders = JSON.parse(localStorage.getItem(ORDERS_KEY) || '[]');
+      orders.unshift(order); // Add to beginning for newest first
+      localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+      
+      return order;
+    }
     
     function loadCart() {
       try {
@@ -1171,7 +1225,7 @@
       }
     }
     
-    // Process M-Pesa payment
+    // Process M-Pesa payment - UPDATED with order saving
     function processMpesaPayment() {
       const phone = document.getElementById('mpesaPhone').value;
       
@@ -1214,25 +1268,33 @@
         </div>
       `;
       
-      // Simulate successful payment after 3 seconds
+      // Simulate successful payment after 3 seconds - UPDATED with order creation
       setTimeout(() => {
+        // Create and save the order
+        const order = createOrderFromCart('mpesa');
+        
         document.getElementById('paymentContent').innerHTML = `
           <div class="text-center py-8">
             <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <i class="fas fa-check text-2xl text-green-600"></i>
             </div>
             <h4 class="text-lg font-bold text-gray-800 mb-2">Payment Successful!</h4>
-            <p class="text-gray-600 mb-6">Your order has been confirmed. Thank you!</p>
+            <p class="text-gray-600 mb-6">Your order #${order.id} has been confirmed. Thank you!</p>
             <div class="bg-gray-50 rounded-lg p-4 mb-6">
               <div class="text-sm text-gray-600">Order Reference:</div>
-              <div class="font-mono font-bold">BB-${Date.now().toString().slice(-6)}</div>
+              <div class="font-mono font-bold">${order.id}</div>
               <div class="text-sm text-gray-600 mt-2">Delivery: ${deliveryFee === 0 ? (deliveryInfo.area === 'other' ? 'Contact for quote' : 'Free') : 'KSh ' + deliveryFee}</div>
               <div class="text-sm text-gray-600">Delivery Date: ${deliveryInfo.date} ${deliveryInfo.time}</div>
               <div class="text-sm text-gray-600">Total Paid: KSh ${total.toLocaleString()}</div>
             </div>
-            <button id="closeSuccess" class="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-medium">
-              Continue Shopping
-            </button>
+            <div class="flex gap-3">
+              <button id="closeSuccess" class="flex-1 border border-teal-600 text-teal-600 hover:bg-teal-50 py-3 rounded-lg font-medium">
+                Continue Shopping
+              </button>
+              <button id="viewOrder" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-medium">
+                View Order
+              </button>
+            </div>
           </div>
         `;
         
@@ -1245,6 +1307,11 @@
         document.getElementById('closeSuccess').addEventListener('click', () => {
           closePaymentModal();
           window.location.href = 'index.html';
+        });
+        
+        document.getElementById('viewOrder').addEventListener('click', () => {
+          closePaymentModal();
+          window.location.href = 'orders.html';
         });
       }, 3000);
     }
@@ -1358,7 +1425,7 @@
       }
     }
     
-    // Process card payment
+    // Process card payment - UPDATED with order saving
     function processCardPayment() {
       const cardNumber = document.getElementById('cardNumber').value;
       const cardExpiry = document.getElementById('cardExpiry').value;
@@ -1400,25 +1467,33 @@
         </div>
       `;
       
-      // Simulate successful payment after 3 seconds
+      // Simulate successful payment after 3 seconds - UPDATED with order creation
       setTimeout(() => {
+        // Create and save the order
+        const order = createOrderFromCart('card');
+        
         document.getElementById('paymentContent').innerHTML = `
           <div class="text-center py-8">
             <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <i class="fas fa-check text-2xl text-blue-600"></i>
             </div>
             <h4 class="text-lg font-bold text-gray-800 mb-2">Payment Successful!</h4>
-            <p class="text-gray-600 mb-6">Your order has been confirmed. Thank you!</p>
+            <p class="text-gray-600 mb-6">Your order #${order.id} has been confirmed. Thank you!</p>
             <div class="bg-gray-50 rounded-lg p-4 mb-6">
               <div class="text-sm text-gray-600">Order Reference:</div>
-              <div class="font-mono font-bold">BB-${Date.now().toString().slice(-6)}</div>
+              <div class="font-mono font-bold">${order.id}</div>
               <div class="text-sm text-gray-600 mt-2">Delivery: ${deliveryFee === 0 ? (deliveryInfo.area === 'other' ? 'Contact for quote' : 'Free') : 'KSh ' + deliveryFee}</div>
               <div class="text-sm text-gray-600">Delivery Date: ${deliveryInfo.date} ${deliveryInfo.time}</div>
               <div class="text-sm text-gray-600">Total Paid: KSh ${total.toLocaleString()}</div>
             </div>
-            <button id="closeCardSuccess" class="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-medium">
-              Continue Shopping
-            </button>
+            <div class="flex gap-3">
+              <button id="closeCardSuccess" class="flex-1 border border-teal-600 text-teal-600 hover:bg-teal-50 py-3 rounded-lg font-medium">
+                Continue Shopping
+              </button>
+              <button id="viewCardOrder" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-medium">
+                View Order
+              </button>
+            </div>
           </div>
         `;
         
@@ -1431,6 +1506,11 @@
         document.getElementById('closeCardSuccess').addEventListener('click', () => {
           closePaymentModal();
           window.location.href = 'index.html';
+        });
+        
+        document.getElementById('viewCardOrder').addEventListener('click', () => {
+          closePaymentModal();
+          window.location.href = 'orders.html';
         });
       }, 3000);
     }

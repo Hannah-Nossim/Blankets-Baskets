@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Blankets & Baskets — My Orders</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Use same styles as cart.html */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    body { 
+      font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+      min-height: 100vh;
+    }
+    .nav-link {
+      position: relative;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -4px;
+      left: 0;
+      background-color: #0d9488;
+      transition: width 0.3s ease;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    .nav-link.active::after {
+      width: 100%;
+    }
+    .order-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .order-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .status-processing { background-color: #fef3c7; color: #92400e; }
+    .status-delivered { background-color: #d1fae5; color: #065f46; }
+    .status-shipped { background-color: #dbeafe; color: #1e40af; }
+    .status-cancelled { background-color: #fee2e2; color: #991b1b; }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Same Header as cart.html -->
+  <header class="bg-white shadow sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 py-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <button id="mobileMenuBtn" class="md:hidden text-gray-700">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+          <a href="index.html" class="text-2xl font-extrabold text-teal-600">blankets &amp; baskets</a>
+        </div>
+
+        <nav class="hidden md:block">
+          <ul class="flex items-center gap-6 text-gray-700">
+            <li><a href="index.html" class="nav-link hover:text-teal-600">Home</a></li>
+            <li><a href="products.html" class="nav-link hover:text-teal-600">Products</a></li>
+            <li><a href="custom-basket.html" class="nav-link hover:text-teal-600">Custom Basket</a></li>
+            <li><a href="add-ons.html" class="nav-link hover:text-teal-600">Add-ons</a></li>
+            <li><a href="cart.html" class="nav-link hover:text-teal-600">Cart</a></li>
+            <!-- NEW: Orders Link -->
+            <li><a href="orders.html" class="nav-link hover:text-teal-600 active">My Orders</a></li>
+          </ul>
+        </nav>
+
+        <div class="flex items-center gap-4">
+          <a href="cart.html" id="cartLink" class="relative text-gray-700">
+            <i class="fas fa-shopping-cart text-xl"></i>
+            <span id="cartCount" class="absolute -top-2 -right-3 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Same Mobile Menu (add orders link) -->
+  <div id="mobileMenu" class="mobile-menu fixed inset-0 z-40 bg-white w-64 p-6 md:hidden">
+    <div class="flex justify-between items-center mb-8">
+      <div class="text-xl font-extrabold text-teal-600">blankets &amp; baskets</div>
+      <button id="closeMobileMenu" class="text-gray-700">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+    <nav>
+      <ul class="space-y-4 text-gray-700">
+        <li><a href="index.html" class="block py-2 hover:text-teal-600 text-lg">Home</a></li>
+        <li><a href="products.html" class="block py-2 hover:text-teal-600 text-lg">Products</a></li>
+        <li><a href="custom-basket.html" class="block py-2 hover:text-teal-600 text-lg">Custom Basket</a></li>
+        <li><a href="add-ons.html" class="block py-2 hover:text-teal-600 text-lg">Add-ons</a></li>
+        <li><a href="cart.html" class="block py-2 hover:text-teal-600 text-lg">Cart</a></li>
+        <!-- NEW: Orders Link -->
+        <li><a href="orders.html" class="block py-2 hover:text-teal-600 text-lg">My Orders</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <div class="mb-8">
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">My Orders</h1>
+      <p class="text-gray-600">View your order history and track current orders</p>
+    </div>
+
+    <!-- Orders Filter Tabs -->
+    <div class="mb-6">
+      <div class="flex flex-wrap gap-2 border-b border-gray-200">
+        <button id="filterAll" class="filter-tab px-4 py-2 font-medium text-teal-600 border-b-2 border-teal-600" data-filter="all">
+          All Orders
+        </button>
+        <button id="filterPending" class="filter-tab px-4 py-2 font-medium text-gray-500 hover:text-gray-700" data-filter="processing">
+          Processing
+        </button>
+        <button id="filterDelivered" class="filter-tab px-4 py-2 font-medium text-gray-500 hover:text-gray-700" data-filter="delivered">
+          Delivered
+        </button>
+        <button id="filterCancelled" class="filter-tab px-4 py-2 font-medium text-gray-500 hover:text-gray-700" data-filter="cancelled">
+          Cancelled
+        </button>
+      </div>
+    </div>
+
+    <!-- Orders Container -->
+    <div id="ordersContainer" class="space-y-6">
+      <!-- Orders will be loaded here dynamically -->
+      <div class="text-center py-12">
+        <i class="fas fa-box-open text-4xl text-gray-300 mb-4"></i>
+        <p class="text-gray-500 mb-2">You haven't placed any orders yet</p>
+        <p class="text-gray-400 text-sm mb-4">Your completed orders will appear here</p>
+        <a href="products.html" class="inline-block mt-4 bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-lg font-medium">
+          Start Shopping
+        </a>
+      </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div id="orderDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+      <div class="bg-white rounded-xl shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-6">
+          <div class="flex justify-between items-start mb-6">
+            <div>
+              <h3 class="text-2xl font-bold text-gray-800">Order Details</h3>
+              <div class="flex items-center gap-3 mt-2">
+                <span id="orderModalId" class="font-mono text-gray-600"></span>
+                <span id="orderModalStatus" class="status-badge"></span>
+              </div>
+            </div>
+            <button id="closeOrderModal" class="text-gray-500 hover:text-gray-700">
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Column: Order Items -->
+            <div class="lg:col-span-2">
+              <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                <h4 class="font-bold text-gray-800 mb-4">Order Items</h4>
+                <div id="orderModalItems" class="space-y-4">
+                  <!-- Items will be loaded here -->
+                </div>
+              </div>
+
+              <!-- Order Timeline -->
+              <div class="bg-gray-50 rounded-lg p-4">
+                <h4 class="font-bold text-gray-800 mb-4">Order Timeline</h4>
+                <div id="orderTimeline" class="space-y-4">
+                  <!-- Timeline will be loaded here -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column: Order Summary & Delivery -->
+            <div class="lg:col-span-1">
+              <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                <h4 class="font-bold text-gray-800 mb-4">Order Summary</h4>
+                <div class="space-y-3">
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Subtotal:</span>
+                    <span id="modalSubtotal" class="font-medium"></span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Delivery:</span>
+                    <span id="modalDelivery" class="font-medium"></span>
+                  </div>
+                  <div class="flex justify-between text-lg font-bold pt-3 border-t border-gray-200">
+                    <span>Total Paid:</span>
+                    <span id="modalTotal" class="text-teal-700"></span>
+                  </div>
+                  <div class="flex justify-between text-sm pt-2">
+                    <span class="text-gray-600">Payment Method:</span>
+                    <span id="modalPayment" class="font-medium"></span>
+                  </div>
+                  <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">Payment Date:</span>
+                    <span id="modalPaymentDate" class="font-medium"></span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Delivery Information -->
+              <div class="bg-gray-50 rounded-lg p-4">
+                <h4 class="font-bold text-gray-800 mb-4">Delivery Information</h4>
+                <div class="space-y-3">
+                  <div>
+                    <div class="text-sm text-gray-600">Deliver to:</div>
+                    <div id="modalDeliveryName" class="font-medium"></div>
+                  </div>
+                  <div>
+                    <div class="text-sm text-gray-600">Phone:</div>
+                    <div id="modalDeliveryPhone" class="font-medium"></div>
+                  </div>
+                  <div>
+                    <div class="text-sm text-gray-600">Address:</div>
+                    <div id="modalDeliveryAddress" class="font-medium"></div>
+                  </div>
+                  <div>
+                    <div class="text-sm text-gray-600">Delivery Date:</div>
+                    <div id="modalDeliveryDate" class="font-medium"></div>
+                  </div>
+                  <div>
+                    <div class="text-sm text-gray-600">Delivery Time:</div>
+                    <div id="modalDeliveryTime" class="font-medium"></div>
+                  </div>
+                  <div id="modalInstructions" class="pt-3 border-t border-gray-200">
+                    <div class="text-sm text-gray-600">Delivery Instructions:</div>
+                    <div id="modalDeliveryInstructions" class="text-sm"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="mt-6 space-y-3">
+                <button id="reorderBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-medium">
+                  <i class="fas fa-redo mr-2"></i>Reorder
+                </button>
+                <button id="cancelOrderBtn" class="w-full border border-red-600 text-red-600 hover:bg-red-50 py-3 rounded-lg font-medium hidden">
+                  <i class="fas fa-times mr-2"></i>Cancel Order
+                </button>
+                <button id="trackOrderBtn" class="w-full border border-teal-600 text-teal-600 hover:bg-teal-50 py-3 rounded-lg font-medium">
+                  <i class="fas fa-map-marker-alt mr-2"></i>Track Order
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Same Footer as cart.html -->
+  <footer class="bg-gray-800 text-white py-12">
+    <!-- Same footer content -->
+  </footer>
+
+  <script>
+    // Order Management
+    const ORDERS_KEY = 'bb_orders';
+    const CART_KEY = 'bb_cart_v2';
+    
+    // Status configurations
+    const ORDER_STATUS = {
+      PROCESSING: 'processing',
+      SHIPPED: 'shipped',
+      DELIVERED: 'delivered',
+      CANCELLED: 'cancelled'
+    };
+    
+    const STATUS_DISPLAY = {
+      'processing': { text: 'Processing', class: 'status-processing' },
+      'shipped': { text: 'Shipped', class: 'status-shipped' },
+      'delivered': { text: 'Delivered', class: 'status-delivered' },
+      'cancelled': { text: 'Cancelled', class: 'status-cancelled' }
+    };
+    
+    // Load orders from localStorage
+    function loadOrders() {
+      try {
+        const orders = localStorage.getItem(ORDERS_KEY);
+        return orders ? JSON.parse(orders) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+    
+    // Save orders to localStorage
+    function saveOrders(orders) {
+      localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+    }
+    
+    // Create a new order from cart and delivery info
+    function createOrderFromCart(paymentMethod) {
+      const cart = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+      const deliveryInfo = JSON.parse(localStorage.getItem('bb_delivery_info') || '{}');
+      
+      if (cart.length === 0) return null;
+      
+      // Calculate totals
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      
+      // Calculate delivery fee
+      const DELIVERY_PRICES = {
+        'nairobi-cbd': 250,
+        'westlands': 250,
+        'kileleshwa': 250,
+        'kilimani': 250,
+        'lavington': 250,
+        'karen': 300,
+        'rongai': 350,
+        'ruaka': 270,
+        'other': 0
+      };
+      
+      const FREE_DELIVERY_THRESHOLD = 5000;
+      const area = deliveryInfo.area || '';
+      let deliveryFee = DELIVERY_PRICES[area] || 250;
+      
+      if (subtotal >= FREE_DELIVERY_THRESHOLD && ['nairobi-cbd', 'westlands', 'kileleshwa', 'kilimani', 'lavington'].includes(area)) {
+        deliveryFee = 0;
+      }
+      
+      const total = subtotal + deliveryFee;
+      
+      // Create order object
+      const order = {
+        id: 'BB-' + Date.now().toString().slice(-6) + '-' + Math.random().toString(36).substr(2, 4).toUpperCase(),
+        date: new Date().toISOString(),
+        items: JSON.parse(JSON.stringify(cart)), // Deep copy
+        subtotal: subtotal,
+        deliveryFee: deliveryFee,
+        total: total,
+        paymentMethod: paymentMethod,
+        paymentStatus: 'paid',
+        deliveryInfo: JSON.parse(JSON.stringify(deliveryInfo)),
+        status: ORDER_STATUS.PROCESSING,
+        timeline: [
+          {
+            event: 'order_placed',
+            description: 'Order placed successfully',
+            timestamp: new Date().toISOString()
+          },
+          {
+            event: 'payment_confirmed',
+            description: 'Payment confirmed',
+            timestamp: new Date().toISOString()
+          },
+          {
+            event: 'order_processing',
+            description: 'Order is being processed',
+            timestamp: new Date().toISOString()
+          }
+        ]
+      };
+      
+      // Add to orders
+      const orders = loadOrders();
+      orders.unshift(order); // Add to beginning for reverse chronological order
+      saveOrders(orders);
+      
+      return order;
+    }
+    
+    // Render orders
+    function renderOrders(filter = 'all') {
+      const container = document.getElementById('ordersContainer');
+      const orders = loadOrders();
+      
+      // Filter orders
+      let filteredOrders = orders;
+      if (filter !== 'all') {
+        filteredOrders = orders.filter(order => order.status === filter);
+      }
+      
+      if (filteredOrders.length === 0) {
+        let message = '';
+        if (filter === 'all') {
+          message = 'You haven\'t placed any orders yet';
+        } else {
+          message = `No ${filter} orders found`;
+        }
+        
+        container.innerHTML = `
+          <div class="text-center py-12">
+            <i class="fas fa-box-open text-4xl text-gray-300 mb-4"></i>
+            <p class="text-gray-500 mb-2">${message}</p>
+            ${filter !== 'all' ? `
+              <button id="showAllOrders" class="inline-block mt-4 text-teal-600 hover:text-teal-700 font-medium">
+                Show all orders
+              </button>
+            ` : `
+              <a href="products.html" class="inline-block mt-4 bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-lg font-medium">
+                Start Shopping
+              </a>
+            `}
+          </div>
+        `;
+        
+        if (filter !== 'all') {
+          document.getElementById('showAllOrders').addEventListener('click', () => {
+            setActiveFilter('all');
+            renderOrders('all');
+          });
+        }
+        return;
+      }
+      
+      container.innerHTML = filteredOrders.map(order => `
+        <div class="order-card bg-white rounded-xl shadow p-6" data-order-id="${order.id}">
+          <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
+            <div>
+              <div class="flex items-center gap-3">
+                <h3 class="text-lg font-bold text-gray-800">Order #${order.id}</h3>
+                <span class="status-badge ${STATUS_DISPLAY[order.status].class}">
+                  ${STATUS_DISPLAY[order.status].text}
+                </span>
+              </div>
+              <p class="text-gray-600 text-sm mt-1">
+                <i class="far fa-calendar mr-1"></i>
+                ${new Date(order.date).toLocaleDateString('en-KE', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}
+              </p>
+            </div>
+            <div class="mt-3 md:mt-0 text-right">
+              <div class="text-2xl font-bold text-teal-700">KSh ${order.total.toLocaleString()}</div>
+              <p class="text-gray-500 text-sm">${order.items.length} item${order.items.length !== 1 ? 's' : ''}</p>
+            </div>
+          </div>
+          
+          <div class="border-t border-gray-200 pt-4">
+            <div class="flex flex-col md:flex-row md:items-center justify-between">
+              <div class="mb-3 md:mb-0">
+                <div class="text-sm text-gray-600">Delivery to:</div>
+                <div class="font-medium">${order.deliveryInfo.name}</div>
+                <div class="text-sm text-gray-600">${order.deliveryInfo.area}</div>
+              </div>
+              
+              <div class="flex gap-3">
+                <button class="view-order-btn px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium" data-order-id="${order.id}">
+                  View Details
+                </button>
+                ${order.status === ORDER_STATUS.PROCESSING ? `
+                  <button class="cancel-order-btn px-4 py-2 border border-red-600 text-red-600 hover:bg-red-50 rounded-lg font-medium" data-order-id="${order.id}">
+                    Cancel
+                  </button>
+                ` : ''}
+                ${order.status === ORDER_STATUS.DELIVERED ? `
+                  <button class="reorder-btn px-4 py-2 border border-teal-600 text-teal-600 hover:bg-teal-50 rounded-lg font-medium" data-order-id="${order.id}">
+                    Reorder
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      
+      // Add event listeners
+      document.querySelectorAll('.view-order-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const orderId = e.target.dataset.orderId;
+          showOrderDetails(orderId);
+        });
+      });
+      
+      document.querySelectorAll('.cancel-order-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const orderId = e.target.dataset.orderId;
+          cancelOrder(orderId);
+        });
+      });
+      
+      document.querySelectorAll('.reorder-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const orderId = e.target.dataset.orderId;
+          reorderItems(orderId);
+        });
+      });
+    }
+    
+    // Show order details modal
+    function showOrderDetails(orderId) {
+      const orders = loadOrders();
+      const order = orders.find(o => o.id === orderId);
+      
+      if (!order) {
+        alert('Order not found');
+        return;
+      }
+      
+      // Update modal content
+      document.getElementById('orderModalId').textContent = `#${order.id}`;
+      
+      // Status badge
+      const statusEl = document.getElementById('orderModalStatus');
+      statusEl.textContent = STATUS_DISPLAY[order.status].text;
+      statusEl.className = `status-badge ${STATUS_DISPLAY[order.status].class}`;
+      
+      // Order items
+      const itemsContainer = document.getElementById('orderModalItems');
+      itemsContainer.innerHTML = order.items.map(item => `
+        <div class="flex items-center justify-between border-b border-gray-200 pb-4 last:border-0 last:pb-0">
+          <div class="flex-1">
+            <div class="font-medium">${item.name}</div>
+            ${item.type === 'custom' ? `
+              <div class="text-sm text-gray-600 mt-1">
+                ${item.items ? item.items.map(i => `${i.quantity}x ${i.name}`).join(', ') : 'Custom items'}
+              </div>
+            ` : ''}
+          </div>
+          <div class="text-right">
+            <div class="font-medium">KSh ${(item.price * item.quantity).toLocaleString()}</div>
+            <div class="text-sm text-gray-600">${item.quantity} x KSh ${item.price.toLocaleString()}</div>
+          </div>
+        </div>
+      `).join('');
+      
+      // Order timeline
+      const timelineContainer = document.getElementById('orderTimeline');
+      timelineContainer.innerHTML = order.timeline.map(event => `
+        <div class="flex items-start gap-3">
+          <div class="w-2 h-2 bg-teal-500 rounded-full mt-2"></div>
+          <div class="flex-1">
+            <div class="font-medium">${event.description}</div>
+            <div class="text-sm text-gray-500">
+              ${new Date(event.timestamp).toLocaleString('en-KE')}
+            </div>
+          </div>
+        </div>
+      `).join('');
+      
+      // Order summary
+      document.getElementById('modalSubtotal').textContent = `KSh ${order.subtotal.toLocaleString()}`;
+      document.getElementById('modalDelivery').textContent = order.deliveryFee === 0 ? 
+        (order.deliveryInfo.area === 'other' ? 'Contact for quote' : 'Free') : 
+        `KSh ${order.deliveryFee}`;
+      document.getElementById('modalTotal').textContent = `KSh ${order.total.toLocaleString()}`;
+      document.getElementById('modalPayment').textContent = order.paymentMethod === 'mpesa' ? 'M-Pesa' : 'Credit/Debit Card';
+      document.getElementById('modalPaymentDate').textContent = new Date(order.date).toLocaleDateString();
+      
+      // Delivery information
+      document.getElementById('modalDeliveryName').textContent = order.deliveryInfo.name;
+      document.getElementById('modalDeliveryPhone').textContent = order.deliveryInfo.phone;
+      document.getElementById('modalDeliveryAddress').textContent = 
+        `${order.deliveryInfo.address}${order.deliveryInfo.building ? ', ' + order.deliveryInfo.building : ''}${order.deliveryInfo.apartment ? ', ' + order.deliveryInfo.apartment : ''}`;
+      document.getElementById('modalDeliveryDate').textContent = order.deliveryInfo.date;
+      document.getElementById('modalDeliveryTime').textContent = order.deliveryInfo.time;
+      
+      if (order.deliveryInfo.instructions) {
+        document.getElementById('modalDeliveryInstructions').textContent = order.deliveryInfo.instructions;
+        document.getElementById('modalInstructions').classList.remove('hidden');
+      } else {
+        document.getElementById('modalInstructions').classList.add('hidden');
+      }
+      
+      // Show/hide cancel button
+      const cancelBtn = document.getElementById('cancelOrderBtn');
+      if (order.status === ORDER_STATUS.PROCESSING) {
+        cancelBtn.classList.remove('hidden');
+        cancelBtn.dataset.orderId = order.id;
+      } else {
+        cancelBtn.classList.add('hidden');
+      }
+      
+      // Set reorder button
+      const reorderBtn = document.getElementById('reorderBtn');
+      reorderBtn.dataset.orderId = order.id;
+      
+      // Set track order button
+      const trackBtn = document.getElementById('trackOrderBtn');
+      trackBtn.dataset.orderId = order.id;
+      
+      // Show modal
+      document.getElementById('orderDetailsModal').classList.remove('hidden');
+      document.getElementById('orderDetailsModal').classList.add('flex');
+    }
+    
+    // Cancel an order
+    function cancelOrder(orderId) {
+      if (!confirm('Are you sure you want to cancel this order? This action cannot be undone.')) {
+        return;
+      }
+      
+      const orders = loadOrders();
+      const orderIndex = orders.findIndex(o => o.id === orderId);
+      
+      if (orderIndex === -1) return;
+      
+      // Update order status
+      orders[orderIndex].status = ORDER_STATUS.CANCELLED;
+      orders[orderIndex].timeline.push({
+        event: 'order_cancelled',
+        description: 'Order cancelled by customer',
+        timestamp: new Date().toISOString()
+      });
+      
+      saveOrders(orders);
+      
+      // Update UI
+      const currentFilter = document.querySelector('.filter-tab.border-teal-600').dataset.filter;
+      renderOrders(currentFilter);
+      
+      // If modal is open, update it
+      if (document.getElementById('orderDetailsModal').classList.contains('flex')) {
+        showOrderDetails(orderId);
+      }
+      
+      alert('Order has been cancelled successfully.');
+    }
+    
+    // Reorder items
+    function reorderItems(orderId) {
+      const orders = loadOrders();
+      const order = orders.find(o => o.id === orderId);
+      
+      if (!order) return;
+      
+      // Clear current cart
+      localStorage.removeItem(CART_KEY);
+      
+      // Add items from order to cart
+      const cartItems = order.items.map(item => ({
+        id: item.id || Date.now().toString(),
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        type: item.type,
+        image: item.image,
+        items: item.items
+      }));
+      
+      localStorage.setItem(CART_KEY, JSON.stringify(cartItems));
+      
+      // Save delivery info from order
+      localStorage.setItem('bb_delivery_info', JSON.stringify(order.deliveryInfo));
+      
+      // Redirect to cart page
+      window.location.href = 'cart.html';
+    }
+    
+    // Set active filter
+    function setActiveFilter(filter) {
+      document.querySelectorAll('.filter-tab').forEach(tab => {
+        if (tab.dataset.filter === filter) {
+          tab.classList.add('text-teal-600', 'border-teal-600');
+          tab.classList.remove('text-gray-500', 'border-transparent');
+        } else {
+          tab.classList.remove('text-teal-600', 'border-teal-600');
+          tab.classList.add('text-gray-500', 'border-transparent');
+        }
+      });
+    }
+    
+    // Close order modal
+    function closeOrderModal() {
+      document.getElementById('orderDetailsModal').classList.add('hidden');
+      document.getElementById('orderDetailsModal').classList.remove('flex');
+    }
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      // Load and render orders
+      renderOrders('all');
+      
+      // Update cart count
+      const cart = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+      const cartCount = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+      document.getElementById('cartCount').textContent = cartCount;
+      if (cartCount === 0) {
+        document.getElementById('cartCount').classList.add('hidden');
+      } else {
+        document.getElementById('cartCount').classList.remove('hidden');
+      }
+      
+      // Filter tabs
+      document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.addEventListener('click', (e) => {
+          const filter = e.target.dataset.filter;
+          setActiveFilter(filter);
+          renderOrders(filter);
+        });
+      });
+      
+      // Close modal buttons
+      document.getElementById('closeOrderModal').addEventListener('click', closeOrderModal);
+      
+      // Close modal when clicking outside
+      document.getElementById('orderDetailsModal').addEventListener('click', (e) => {
+        if (e.target.id === 'orderDetailsModal') {
+          closeOrderModal();
+        }
+      });
+      
+      // Reorder button in modal
+      document.getElementById('reorderBtn').addEventListener('click', (e) => {
+        const orderId = e.target.dataset.orderId;
+        reorderItems(orderId);
+      });
+      
+      // Cancel order button in modal
+      document.getElementById('cancelOrderBtn').addEventListener('click', (e) => {
+        const orderId = e.target.dataset.orderId;
+        cancelOrder(orderId);
+      });
+      
+      // Track order button
+      document.getElementById('trackOrderBtn').addEventListener('click', (e) => {
+        const orderId = e.target.dataset.orderId;
+        alert(`Tracking for order #${orderId} would be implemented here.`);
+      });
+      
+      // Mobile menu (same as cart.html)
+      document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+        document.getElementById('mobileMenu').classList.add('open');
+      });
+      
+      document.getElementById('closeMobileMenu')?.addEventListener('click', () => {
+        document.getElementById('mobileMenu').classList.remove('open');
+      });
+    });
+  </script>
+</body>
+</html>
