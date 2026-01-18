@@ -234,6 +234,25 @@
     .low-stock-badge {
       animation: lowStockPulse 3s infinite;
     }
+    /* Product image styles */
+    .product-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 0.5rem;
+    }
+    .product-image-placeholder {
+      background: linear-gradient(45deg, #f0f9ff, #dcfce7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-product-image {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      border-radius: 0.5rem;
+    }
     @media (max-width: 768px) {
       .modal-product-details {
         grid-template-columns: 1fr;
@@ -519,7 +538,7 @@
       <div class="modal-body">
         <div class="modal-product-details">
           <div class="modal-product-image">
-            <i class="fas fa-users" id="modalIcon"></i>
+            <!-- Modal image will be inserted here -->
           </div>
           <div class="modal-product-info">
             <h4 id="modalProductName">Family Fun Picnic Kit</h4>
@@ -658,6 +677,7 @@
         description: 'Perfect for romantic outings or casual dates. This kit includes all the essentials for a delightful picnic experience for two.',
         imageColor: 'from-amber-100 to-orange-100',
         icon: 'fa-heart',
+        image: 'assets/images/classic_couple_kit.jpg',
         iconColor: 'text-amber-300',
         rating: 4.5,
         reviews: 892,
@@ -682,6 +702,7 @@
         description: 'The ultimate family picnic solution with diverse food options that cater to both kids and adults. Perfect for birthdays and family gatherings.',
         imageColor: 'from-blue-100 to-cyan-100',
         icon: 'fa-users',
+        image: 'assets/images/family_fun_kit.jpg',
         iconColor: 'text-blue-300',
         rating: 4.7,
         reviews: 1248,
@@ -709,6 +730,7 @@
         description: 'Authentic Kenyan grill experience perfect for outdoor gatherings and celebrations. Comes with traditional accompaniments.',
         imageColor: 'from-red-100 to-orange-100',
         icon: 'fa-fire',
+        image: 'assets/images/choma_box_kit.jpg',
         iconColor: 'text-red-300',
         rating: 4.6,
         reviews: 1048,
@@ -735,6 +757,7 @@
         description: 'Completely plant-based picnic experience with fresh, flavorful options that satisfy both vegans and non-vegans alike.',
         imageColor: 'from-green-100 to-emerald-100',
         icon: 'fa-leaf',
+        image: 'assets/images/vegan_delight_kit.jpg',
         iconColor: 'text-green-300',
         rating: 4.8,
         reviews: 1245,
@@ -762,6 +785,7 @@
         description: 'Perfect for corporate retreats, team building events, or large family gatherings. Designed to feed a crowd with variety.',
         imageColor: 'from-purple-100 to-violet-100',
         icon: 'fa-users',
+        image: 'assets/images/team_building_kit.jpg',
         iconColor: 'text-purple-300',
         rating: 4.9,
         reviews: 2156,
@@ -788,6 +812,7 @@
         description: 'Create magical moments with this premium romantic setup. Perfect for anniversaries, proposals, or special date nights.',
         imageColor: 'from-pink-100 to-rose-100',
         icon: 'fa-heart',
+        image: 'assets/images/romantic_evening_kit.jpg',
         iconColor: 'text-pink-300',
         rating: 4.4,
         reviews: 567,
@@ -815,6 +840,7 @@
         description: 'Designed specifically for children\'s parties and playdates. Kid-friendly foods with fun presentation and activities.',
         imageColor: 'from-yellow-100 to-amber-100',
         icon: 'fa-child',
+        image: 'assets/images/kids_party_kit.jpg',
         iconColor: 'text-yellow-300',
         rating: 4.6,
         reviews: 932,
@@ -843,6 +869,7 @@
         description: 'Professional catering solution for business meetings, corporate events, or office celebrations.',
         imageColor: 'from-gray-100 to-slate-100',
         icon: 'fa-briefcase',
+        image: 'assets/images/corporate_lunch_kit.jpg',
         iconColor: 'text-gray-300',
         rating: 4.7,
         reviews: 1876,
@@ -857,7 +884,7 @@
           'Bottled Water (still and sparkling)',
           'Assorted Cookies and pastries',
           'Coffee and tea service',
-          'Pilau rice ',
+          'Pilau rice',
           'Vegetable curry',
           'Ugali and stewed beef',
           'Professional serving utensils'          
@@ -938,14 +965,21 @@
           </div>
         ` : '';
         
+        // Image or icon fallback
+        const productImage = product.image ? 
+          `<img src="${product.image}" alt="${product.name}" class="product-image">` :
+          `<div class="product-image-placeholder h-full w-full rounded-lg">
+            <i class="fas ${product.icon} text-5xl ${product.iconColor}"></i>
+           </div>`;
+        
         return `
         <div class="product-card bg-white rounded-xl shadow p-5 flex flex-col relative" data-category="${product.category}">
           ${discountBadge}
           ${stockBadge}
           
           <!-- Product Image -->
-          <div class="aspect-video rounded-lg bg-gradient-to-r ${product.imageColor} flex items-center justify-center mb-4">
-            <i class="fas ${product.icon} text-4xl ${product.iconColor}"></i>
+          <div class="aspect-video rounded-lg overflow-hidden mb-4">
+            ${productImage}
           </div>
           
           <!-- Product Title and Trust Signals -->
@@ -1102,8 +1136,9 @@
       // Quantity buttons
       document.querySelectorAll('.quantity-btn').forEach(button => {
         button.addEventListener('click', (e) => {
-          const productId = e.target.closest('button').dataset.id;
-          const action = e.target.closest('button').dataset.action;
+          const btn = e.target.closest('button');
+          const productId = btn.dataset.id;
+          const action = btn.dataset.action;
           updateQuantity(productId, action);
         });
       });
@@ -1178,7 +1213,14 @@
       document.getElementById('modalReviews').textContent = `(${product.reviews.toLocaleString()} reviews)`;
       document.getElementById('modalPax').textContent = `${product.pax} pax`;
       document.getElementById('modalCategory').textContent = product.category;
-      document.getElementById('modalIcon').className = `fas ${product.icon} text-8xl ${product.iconColor}`;
+      
+      // Update modal image
+      const modalImageContainer = document.querySelector('.modal-product-image');
+      if (product.image) {
+        modalImageContainer.innerHTML = `<img src="${product.image}" alt="${product.name}" class="modal-product-image w-full h-full object-cover rounded-lg">`;
+      } else {
+        modalImageContainer.innerHTML = `<i class="fas ${product.icon} text-8xl ${product.iconColor}"></i>`;
+      }
       
       // Update stock information in modal
       const stockInfoDiv = document.getElementById('modalStockInfo');
