@@ -112,6 +112,18 @@
       50% { transform: scale(1.05); }
       100% { transform: scale(1); }
     }
+    .addon-image {
+      object-fit: cover;
+      width: 100%;
+      height: 100%;
+      border-radius: 0.5rem;
+    }
+    .image-placeholder {
+      background: linear-gradient(45deg, #f0f9ff, #dcfce7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -242,22 +254,26 @@
     
     <!-- Statistics -->
     <div class="mt-12 p-6 bg-gradient-to-r from-teal-50 to-teal-100 rounded-xl">
-      <h2 class="text-xl font-bold text-gray-800 mb-4">Add-ons CategorySummary</h2>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <h2 class="text-xl font-bold text-gray-800 mb-4">Add-ons Category Summary</h2>
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
         <div class="bg-white p-4 rounded-lg shadow text-center">
-          <div class="text-2xl font-bold text-teal-600" id="totalAddons">12</div>
+          <div class="text-2xl font-bold text-teal-600" id="totalAddons">13</div>
           <div class="text-gray-600 text-sm">Total Add-ons</div>
         </div>
         <div class="bg-white p-4 rounded-lg shadow text-center">
-          <div class="text-2xl font-bold text-teal-600" id="utensilsCount">4</div>
+          <div class="text-2xl font-bold text-teal-600" id="utensilsCount">5</div>
           <div class="text-gray-600 text-sm">Utensils</div>
         </div>
         <div class="bg-white p-4 rounded-lg shadow text-center">
-          <div class="text-2xl font-bold text-teal-600" id="servingCount">2</div>
+          <div class="text-2xl font-bold text-teal-600" id="servingCount">1</div>
           <div class="text-gray-600 text-sm">Serving Items</div>
         </div>
         <div class="bg-white p-4 rounded-lg shadow text-center">
-          <div class="text-2xl font-bold text-teal-600" id="decorCount">3</div>
+          <div class="text-2xl font-bold text-teal-600" id="storageCount">3</div>
+          <div class="text-gray-600 text-sm">Storage</div>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow text-center">
+          <div class="text-2xl font-bold text-teal-600" id="decorCount">4</div>
           <div class="text-gray-600 text-sm">Decor Items</div>
         </div>
       </div>
@@ -425,7 +441,7 @@
       }
     }
     
-    // Add-ons Data
+    // Add-ons Data with Images - CORRECTED PATHS
     const ADDONS = [
       { 
         id: 'napkins', 
@@ -433,7 +449,8 @@
         price: 150, 
         category: 'utensils',
         description: 'Quality paper napkins (pack of 50) for your picnic.',
-        icon: 'fa-napkin'
+        icon: 'fa-napkin',
+        image: 'assets/images/paper_napkins.jpg'
       },
       { 
         id: 'plates', 
@@ -441,7 +458,8 @@
         price: 250, 
         category: 'utensils',
         description: 'Sturdy disposable plates (pack of 10).',
-        icon: 'fa-plate-utensils'
+        icon: 'fa-plate-utensils',
+        image: 'assets/images/disposable_plates.jpg'
       },
       { 
         id: 'utensils', 
@@ -449,7 +467,8 @@
         price: 200, 
         category: 'utensils',
         description: 'Forks, knives, and spoons (pack of 10).',
-        icon: 'fa-utensils'
+        icon: 'fa-utensils',
+        image: 'assets/images/disposable_utensil_set.jpg'
       },
       { 
         id: 'icebox', 
@@ -457,7 +476,8 @@
         price: 1200, 
         category: 'storage',
         description: 'Small icebox to keep drinks and food cool.',
-        icon: 'fa-snowflake'
+        icon: 'fa-snowflake',
+        image: 'assets/images/portable_icebox.jpg'
       },
       { 
         id: 'blanket', 
@@ -465,7 +485,8 @@
         price: 950, 
         category: 'decor',
         description: 'Water-resistant picnic blanket for comfortable seating.',
-        icon: 'fa-blanket'
+        icon: 'fa-blanket',
+        image: 'assets/images/picnic_blanket.jpg'
       },
       { 
         id: 'candles', 
@@ -473,7 +494,8 @@
         price: 300, 
         category: 'decor',
         description: 'Flame-free ambiance lighting (set of 4).',
-        icon: 'fa-candle'
+        icon: 'fa-candle',
+        image: 'assets/images/led_candles.jpg'
       },
       { 
         id: 'thermos', 
@@ -481,7 +503,8 @@
         price: 450, 
         category: 'serving',
         description: 'Keep drinks hot or cold for hours.',
-        icon: 'fa-mug-hot'
+        icon: 'fa-mug-hot',
+        image: 'assets/images/insulated_thermos.jpg'
       },
       { 
         id: 'basket', 
@@ -489,7 +512,8 @@
         price: 1200, 
         category: 'storage',
         description: 'Traditional woven picnic basket with handles.',
-        icon: 'fa-basket-shopping'
+        icon: 'fa-basket-shopping',
+        image: 'assets/images/woven_picnic_basket.jpg'
       },
       { 
         id: 'cutlery-set', 
@@ -497,7 +521,8 @@
         price: 350, 
         category: 'utensils',
         description: 'Eco-friendly reusable utensils (3 sets).',
-        icon: 'fa-cutlery'
+        icon: 'fa-cutlery',
+        image: 'assets/images/reusable_cutlery_set.jpg'
       },
       { 
         id: 'speaker', 
@@ -505,7 +530,8 @@
         price: 1900, 
         category: 'decor',
         description: 'Water-resistant portable speaker for music.',
-        icon: 'fa-music'
+        icon: 'fa-music',
+        image: 'assets/images/bluetooth_speaker.jpg'
       },
       { 
         id: 'cooler-bag', 
@@ -513,7 +539,8 @@
         price: 400, 
         category: 'storage',
         description: 'Lightweight cooler bag for drinks and snacks.',
-        icon: 'fa-bag-shopping'
+        icon: 'fa-bag-shopping',
+        image: 'assets/images/insulated_cooler_bag.jpg'
       },
       { 
         id: 'flowers', 
@@ -521,7 +548,17 @@
         price: 1800, 
         category: 'decor',
         description: 'Beautiful fresh flowers for decoration.',
-        icon: 'fa-flower'
+        icon: 'fa-flower',
+        image: 'assets/images/fresh_flower_bouquet.jpg'
+      },
+      {
+        id: 'cups', 
+        name: 'Disposable Cups', 
+        price: 600, 
+        category: 'utensils',
+        description: 'Set of disposable cups and straws for serving drinks.',
+        icon: 'fa-cup-straw',
+        image: 'assets/images/disposable_cups.jpg'
       }
     ];
     
@@ -581,8 +618,13 @@
       
       container.innerHTML = filtered.map(addon => `
         <div class="addon-card bg-white rounded-xl shadow p-5 fade-in" data-category="${addon.category}">
-          <div class="aspect-square rounded-lg bg-gradient-to-r from-teal-50 to-teal-100 flex items-center justify-center mb-4 relative">
-            <i class="fas ${addon.icon || 'fa-plus'} text-4xl text-teal-400"></i>
+          <div class="aspect-square rounded-lg overflow-hidden relative mb-4">
+            ${addon.image ? 
+              `<img src="${addon.image}" alt="${addon.name}" class="addon-image hover:scale-105 transition-transform duration-300">` :
+              `<div class="image-placeholder w-full h-full">
+                <i class="fas ${addon.icon || 'fa-plus'} text-4xl text-teal-400"></i>
+              </div>`
+            }
             <span class="absolute top-2 right-2 ${getCategoryClass(addon.category)} text-xs px-2 py-1 rounded-full font-medium">
               ${addon.category.charAt(0).toUpperCase() + addon.category.slice(1)}
             </span>
@@ -635,6 +677,7 @@
       
       document.getElementById('utensilsCount').textContent = utensilsCount;
       document.getElementById('servingCount').textContent = servingCount;
+      document.getElementById('storageCount').textContent = storageCount;
       document.getElementById('decorCount').textContent = decorCount;
     }
     
@@ -708,7 +751,8 @@
           price: addon.price,
           quantity: quantity,
           type: 'addon',
-          category: addon.category
+          category: addon.category,
+          image: addon.image
         });
       }
       
