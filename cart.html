@@ -544,20 +544,21 @@
     </div>
   </footer>
 
-  <!-- Payment Modal -->
+  <!-- Payment Modal - FIXED: Scrollable version -->
   <div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-lg max-w-md w-full">
-      <div class="p-6">
-        <div class="flex justify-between items-center mb-4">
+    <div class="bg-white rounded-xl shadow-lg max-w-md w-full max-h-[90vh] flex flex-col">
+      <div class="p-6 border-b border-gray-200 flex-shrink-0">
+        <div class="flex justify-between items-center">
           <h3 class="text-xl font-bold text-gray-800">Complete Payment</h3>
           <button id="closePaymentModal" class="text-gray-500 hover:text-gray-700">
             <i class="fas fa-times"></i>
           </button>
         </div>
-        
-        <div id="paymentContent">
-          <!-- Payment content will be dynamically loaded -->
-        </div>
+      </div>
+      
+      <!-- Scrollable content area -->
+      <div id="paymentContent" class="flex-1 overflow-y-auto p-6">
+        <!-- Payment content will be dynamically loaded -->
       </div>
     </div>
   </div>
@@ -566,7 +567,7 @@
     // Cart Management
     const CART_KEY = 'bb_cart_v2';
     const DELIVERY_KEY = 'bb_delivery_info';
-    const ORDERS_KEY = 'bb_orders'; // NEW: Orders storage key
+    const ORDERS_KEY = 'bb_orders';
     
     // Delivery price mapping based on area
     const DELIVERY_PRICES = {
@@ -584,7 +585,7 @@
     // Free delivery threshold
     const FREE_DELIVERY_THRESHOLD = 5000;
     
-    // NEW: Function to create and save orders
+    // Function to create and save orders
     function createOrderFromCart(paymentMethod) {
       const cart = loadCart();
       const deliveryInfo = loadDeliveryInfo();
@@ -600,7 +601,7 @@
       const order = {
         id: 'BB-' + Date.now().toString().slice(-6) + '-' + Math.random().toString(36).substr(2, 4).toUpperCase(),
         date: new Date().toISOString(),
-        items: JSON.parse(JSON.stringify(cart)), // Deep copy
+        items: JSON.parse(JSON.stringify(cart)),
         subtotal: subtotal,
         deliveryFee: deliveryFee,
         total: total,
@@ -629,7 +630,7 @@
       
       // Save to orders
       const orders = JSON.parse(localStorage.getItem(ORDERS_KEY) || '[]');
-      orders.unshift(order); // Add to beginning for newest first
+      orders.unshift(order);
       localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
       
       return order;
@@ -685,10 +686,12 @@
         return;
       }
       
+      // Always show delivery section when cart has items
+      document.getElementById('deliverySection').style.display = 'block';
+      
       // Enable checkout button only if delivery info exists
       const deliveryInfo = loadDeliveryInfo();
       document.getElementById('checkoutBtn').disabled = !deliveryInfo;
-      document.getElementById('deliverySection').style.display = 'block';
       
       container.innerHTML = cart.map((item, index) => `
         <div class="cart-item border-b border-gray-200 pb-6 mb-6 last:border-0 last:mb-0 last:pb-0">
@@ -750,7 +753,6 @@
         if (cart[index].quantity > 1) {
           cart[index].quantity -= 1;
         } else {
-          // Remove item if quantity becomes 0
           cart.splice(index, 1);
         }
       }
@@ -782,19 +784,16 @@
     
     // Calculate delivery fee based on area and subtotal
     function calculateDeliveryFee(area, subtotal) {
-      if (!area || area === '') return 250; // Default KSh 250
+      if (!area || area === '') return 250;
       
       const baseFee = DELIVERY_PRICES[area] || 250;
       
-      // Check if free delivery applies (only for orders above threshold in certain areas)
       if (subtotal >= FREE_DELIVERY_THRESHOLD) {
-        // Free delivery applies only to these areas
         if (['nairobi-cbd', 'westlands', 'kileleshwa', 'kilimani', 'lavington'].includes(area)) {
-          return 0; // Free for these areas
+          return 0;
         } else if (area === 'other') {
-          return 0; // Contact for quote
+          return 0;
         }
-        // Other areas keep their base fee even with high subtotal
         return baseFee;
       }
       
@@ -806,17 +805,14 @@
       const cart = loadCart();
       const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       
-      // Get current delivery area from saved info OR from the form
       const deliveryInfo = loadDeliveryInfo();
       const currentArea = deliveryInfo ? deliveryInfo.area : (document.getElementById('deliveryArea')?.value || '');
       const deliveryFee = calculateDeliveryFee(currentArea, subtotal);
       
       const total = subtotal + deliveryFee;
       
-      // Update subtotal
       document.getElementById('subtotalAmount').textContent = `KSh ${subtotal.toLocaleString()}`;
       
-      // Update delivery
       const deliveryElement = document.getElementById('deliveryAmount');
       if (deliveryElement) {
         if (deliveryFee === 0) {
@@ -836,10 +832,8 @@
         }
       }
       
-      // Update total
       document.getElementById('totalAmount').textContent = `KSh ${total.toLocaleString()}`;
       
-      // Update delivery info message
       const deliveryInfoElement = document.getElementById('deliveryInfo');
       if (deliveryInfoElement) {
         if (deliveryFee === 0 && subtotal >= FREE_DELIVERY_THRESHOLD) {
@@ -860,7 +854,6 @@
         }
       }
       
-      // Update checkout button state
       const checkoutBtn = document.getElementById('checkoutBtn');
       if (deliveryInfo && cart.length > 0) {
         checkoutBtn.disabled = false;
@@ -892,7 +885,6 @@
       const cart = loadCart();
       
       if (deliveryInfo && cart.length > 0) {
-        // Format the area name for display
         const areaDisplayNames = {
           'nairobi-cbd': 'Nairobi CBD',
           'westlands': 'Westlands',
@@ -906,12 +898,9 @@
         };
         
         const displayArea = areaDisplayNames[deliveryInfo.area] || deliveryInfo.area;
-        
-        // Calculate delivery fee for status display
         const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const deliveryFee = calculateDeliveryFee(deliveryInfo.area, subtotal);
         
-        // Update status indicator
         statusElement.innerHTML = `
           <div class="flex items-center gap-3 mb-2">
             <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
@@ -927,7 +916,6 @@
           </button>
         `;
         
-        // Update delivery summary at the top
         document.getElementById('deliverySummary').style.display = 'block';
         document.getElementById('summaryName').textContent = `Name: ${deliveryInfo.name}`;
         document.getElementById('summaryPhone').textContent = `Phone: ${deliveryInfo.phone}`;
@@ -938,18 +926,13 @@
           document.getElementById('summaryInstructions').textContent = `Instructions: ${deliveryInfo.instructions}`;
         }
         
-        // Hide form, show edit button
         document.getElementById('saveDeliveryBtn').style.display = 'none';
         document.getElementById('editDeliveryBtn').style.display = 'block';
         
-        // Enable checkout button
         checkoutBtn.disabled = false;
         checkoutBtn.classList.remove('opacity-50', 'cursor-not-allowed');
         
       } else {
-        // Reset to default state
-        const addBtn = document.getElementById('addDeliveryBtn');
-        
         if (cart.length > 0) {
           statusElement.innerHTML = `
             <div class="flex items-center gap-3 mb-2">
@@ -982,20 +965,17 @@
         document.getElementById('saveDeliveryBtn').style.display = 'block';
         document.getElementById('editDeliveryBtn').style.display = 'none';
         
-        // Disable checkout button
         checkoutBtn.disabled = true;
         checkoutBtn.classList.add('opacity-50', 'cursor-not-allowed');
       }
     }
     
     function showDeliveryForm() {
-      // Show the form
       document.getElementById('deliverySection').style.display = 'block';
       document.getElementById('saveDeliveryBtn').style.display = 'block';
       document.getElementById('editDeliveryBtn').style.display = 'none';
       document.getElementById('deliverySummary').style.display = 'none';
       
-      // Load saved data if exists
       const savedInfo = loadDeliveryInfo();
       if (savedInfo) {
         document.getElementById('deliveryName').value = savedInfo.name || '';
@@ -1014,7 +994,6 @@
     function validateDeliveryForm() {
       let isValid = true;
       
-      // Clear previous errors
       document.querySelectorAll('.validation-error').forEach(el => {
         el.classList.remove('validation-error');
       });
@@ -1022,7 +1001,6 @@
         el.classList.add('hidden');
       });
       
-      // Validate name
       const name = document.getElementById('deliveryName').value.trim();
       if (!name) {
         document.getElementById('deliveryName').classList.add('validation-error');
@@ -1030,7 +1008,6 @@
         isValid = false;
       }
       
-      // Validate phone
       const phone = document.getElementById('deliveryPhone').value.trim();
       const phoneRegex = /^07\d{8}$/;
       if (!phone || !phoneRegex.test(phone)) {
@@ -1039,7 +1016,6 @@
         isValid = false;
       }
       
-      // Validate area
       const area = document.getElementById('deliveryArea').value;
       if (!area) {
         document.getElementById('deliveryArea').classList.add('validation-error');
@@ -1047,7 +1023,6 @@
         isValid = false;
       }
       
-      // Validate address
       const address = document.getElementById('deliveryAddress').value.trim();
       if (!address) {
         document.getElementById('deliveryAddress').classList.add('validation-error');
@@ -1055,7 +1030,6 @@
         isValid = false;
       }
       
-      // Validate date
       const date = document.getElementById('deliveryDate').value;
       if (!date) {
         document.getElementById('deliveryDate').classList.add('validation-error');
@@ -1063,7 +1037,6 @@
         isValid = false;
       }
       
-      // Validate time
       const time = document.getElementById('deliveryTime').value;
       if (!time) {
         document.getElementById('deliveryTime').classList.add('validation-error');
@@ -1094,12 +1067,9 @@
       };
       
       saveDeliveryInfo(deliveryInfo);
-      
-      // CRITICAL FIX: Update both the status and order summary
       updateDeliveryStatus();
       updateOrderSummary();
       
-      // Show success message
       const saveBtn = document.getElementById('saveDeliveryBtn');
       const originalText = saveBtn.textContent;
       saveBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Details Saved!';
@@ -1134,21 +1104,18 @@
       }
     }
     
-    // Show M-Pesa payment
+    // Show M-Pesa payment - UPDATED: Compact layout
     function showMpesaPayment() {
       const modal = document.getElementById('paymentModal');
       const content = document.getElementById('paymentContent');
       
-      // Calculate totals
       const cart = loadCart();
       const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       const deliveryInfo = loadDeliveryInfo();
       
-      // Get delivery fee
       const deliveryFee = calculateDeliveryFee(deliveryInfo.area, subtotal);
       const total = subtotal + deliveryFee;
       
-      // Format area for display
       const areaDisplayNames = {
         'nairobi-cbd': 'Nairobi CBD',
         'westlands': 'Westlands',
@@ -1164,51 +1131,69 @@
       const displayArea = areaDisplayNames[deliveryInfo.area] || deliveryInfo.area;
       
       content.innerHTML = `
-        <div class="text-center">
-          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <i class="fas fa-mobile-alt text-2xl text-green-600"></i>
+        <div class="space-y-4">
+          <div class="text-center">
+            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <i class="fas fa-mobile-alt text-xl text-green-600"></i>
+            </div>
+            <h4 class="text-lg font-bold text-gray-800 mb-1">Pay with M-Pesa</h4>
+            <p class="text-gray-600 text-sm">You'll receive a payment request on your phone.</p>
           </div>
-          <h4 class="text-lg font-bold text-gray-800 mb-2">Pay with M-Pesa</h4>
-          <p class="text-gray-600 mb-6">You'll receive a payment request on your phone.</p>
           
-          <!-- Delivery Summary -->
-          <div class="bg-gray-50 rounded-lg p-4 mb-4">
-            <h5 class="font-medium text-gray-800 mb-2">Delivery Summary</h5>
-            <div class="text-sm text-gray-600 text-left space-y-1">
-              <div><span class="font-medium">To:</span> ${deliveryInfo.name}</div>
-              <div><span class="font-medium">Phone:</span> ${deliveryInfo.phone}</div>
-              <div><span class="font-medium">Area:</span> ${displayArea}</div>
-              <div><span class="font-medium">Date:</span> ${deliveryInfo.date}</div>
-              <div><span class="font-medium">Time:</span> ${deliveryInfo.time}</div>
+          <div class="bg-gray-50 rounded-lg p-3">
+            <h5 class="font-medium text-gray-800 mb-2 text-sm">Delivery Summary</h5>
+            <div class="text-xs text-gray-600 space-y-1">
+              <div class="flex justify-between">
+                <span>To:</span>
+                <span class="font-medium">${deliveryInfo.name}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Phone:</span>
+                <span class="font-medium">${deliveryInfo.phone}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Area:</span>
+                <span class="font-medium">${displayArea}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Date:</span>
+                <span class="font-medium">${deliveryInfo.date}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Time:</span>
+                <span class="font-medium">${deliveryInfo.time}</span>
+              </div>
             </div>
           </div>
           
-          <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">M-Pesa Phone Number</label>
-            <input type="tel" id="mpesaPhone" class="w-full border border-gray-300 rounded-lg p-3" placeholder="07XXXXXXXX" maxlength="10" value="${deliveryInfo.phone}">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">M-Pesa Phone Number</label>
+            <input type="tel" id="mpesaPhone" class="w-full border border-gray-300 rounded-lg p-2 text-sm" placeholder="07XXXXXXXX" maxlength="10" value="${deliveryInfo.phone}">
           </div>
           
-          <div class="bg-gray-50 rounded-lg p-4 mb-6">
-            <div class="flex justify-between mb-2">
-              <span class="text-gray-600">Order Total:</span>
-              <span class="font-bold">KSh ${subtotal.toLocaleString()}</span>
+          <div class="bg-gray-50 rounded-lg p-3">
+            <div class="space-y-1 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Order Total:</span>
+                <span class="font-bold">KSh ${subtotal.toLocaleString()}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Delivery:</span>
+                <span class="font-bold">${deliveryFee === 0 ? (deliveryInfo.area === 'other' ? 'Contact for quote' : 'Free') : 'KSh ' + deliveryFee}</span>
+              </div>
+              <div class="flex justify-between mt-2 pt-2 border-t border-gray-200">
+                <span class="text-gray-800 font-bold">Amount to pay:</span>
+                <span class="font-bold" id="paymentAmount">${deliveryFee === 0 && deliveryInfo.area === 'other' ? 'Contact for quote' : 'KSh ' + total.toLocaleString()}</span>
+              </div>
+              <p class="text-xs text-gray-500 mt-2">Check your phone for the STK Push prompt</p>
             </div>
-            <div class="flex justify-between mb-2">
-              <span class="text-gray-600">Delivery:</span>
-              <span class="font-bold">${deliveryFee === 0 ? (deliveryInfo.area === 'other' ? 'Contact for quote' : 'Free') : 'KSh ' + deliveryFee}</span>
-            </div>
-            <div class="flex justify-between mt-2 pt-2 border-t border-gray-200">
-              <span class="text-gray-800 font-bold">Amount to pay:</span>
-              <span class="font-bold text-lg" id="paymentAmount">${deliveryFee === 0 && deliveryInfo.area === 'other' ? 'Contact for quote' : 'KSh ' + total.toLocaleString()}</span>
-            </div>
-            <div class="text-sm text-gray-500 mt-2">Check your phone for the STK Push prompt</div>
           </div>
           
-          <div class="flex gap-3">
-            <button id="cancelPayment" class="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium">
+          <div class="flex gap-3 pt-2">
+            <button id="cancelPayment" class="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg text-sm font-medium">
               Cancel
             </button>
-            <button id="confirmMpesaPayment" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium" ${deliveryFee === 0 && deliveryInfo.area === 'other' ? 'disabled' : ''}>
+            <button id="confirmMpesaPayment" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-sm font-medium" ${deliveryFee === 0 && deliveryInfo.area === 'other' ? 'disabled' : ''}>
               ${deliveryFee === 0 && deliveryInfo.area === 'other' ? 'Contact for Quote' : 'Pay Now'}
             </button>
           </div>
@@ -1218,14 +1203,13 @@
       modal.classList.remove('hidden');
       modal.classList.add('flex');
       
-      // Add event listeners
       document.getElementById('cancelPayment').addEventListener('click', closePaymentModal);
       if (!(deliveryFee === 0 && deliveryInfo.area === 'other')) {
         document.getElementById('confirmMpesaPayment').addEventListener('click', processMpesaPayment);
       }
     }
     
-    // Process M-Pesa payment - UPDATED with order saving
+    // Process M-Pesa payment
     function processMpesaPayment() {
       const phone = document.getElementById('mpesaPhone').value;
       
@@ -1234,71 +1218,68 @@
         return;
       }
       
-      // Calculate totals
       const cart = loadCart();
       const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       const deliveryInfo = loadDeliveryInfo();
       
-      // Get delivery fee
       const deliveryFee = calculateDeliveryFee(deliveryInfo.area, subtotal);
       const total = subtotal + deliveryFee;
       
-      // Simulate payment processing
       document.getElementById('paymentContent').innerHTML = `
-        <div class="text-center py-8">
-          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <i class="fas fa-spinner fa-spin text-2xl text-green-600"></i>
+        <div class="text-center py-4">
+          <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 animate-pulse">
+            <i class="fas fa-spinner fa-spin text-xl text-green-600"></i>
           </div>
-          <h4 class="text-lg font-bold text-gray-800 mb-2">Processing Payment</h4>
-          <p class="text-gray-600 mb-4">Please check your phone for the STK Push prompt.</p>
-          <div class="bg-gray-50 rounded-lg p-4 mb-4">
-            <div class="flex justify-between mb-1">
-              <span class="text-gray-600">Amount:</span>
-              <span class="font-bold">KSh ${total.toLocaleString()}</span>
-            </div>
-            <div class="flex justify-between mb-1">
-              <span class="text-gray-600">Phone:</span>
-              <span class="font-bold">${phone}</span>
-            </div>
-            <div class="flex justify-between mt-2 pt-2 border-t border-gray-200">
-              <span class="text-gray-800">Delivery to:</span>
-              <span class="font-medium">${deliveryInfo.area}</span>
+          <h4 class="text-lg font-bold text-gray-800 mb-1">Processing Payment</h4>
+          <p class="text-gray-600 text-sm mb-3">Please check your phone for the STK Push prompt.</p>
+          <div class="bg-gray-50 rounded-lg p-3">
+            <div class="text-xs text-gray-600">
+              <div class="flex justify-between mb-1">
+                <span>Amount:</span>
+                <span class="font-bold">KSh ${total.toLocaleString()}</span>
+              </div>
+              <div class="flex justify-between mb-1">
+                <span>Phone:</span>
+                <span class="font-bold">${phone}</span>
+              </div>
+              <div class="flex justify-between mt-1 pt-1 border-t border-gray-200">
+                <span class="text-gray-800">Delivery to:</span>
+                <span class="font-medium">${deliveryInfo.area}</span>
+              </div>
             </div>
           </div>
         </div>
       `;
       
-      // Simulate successful payment after 3 seconds - UPDATED with order creation
       setTimeout(() => {
-        // Create and save the order
         const order = createOrderFromCart('mpesa');
         
         document.getElementById('paymentContent').innerHTML = `
-          <div class="text-center py-8">
-            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i class="fas fa-check text-2xl text-green-600"></i>
+          <div class="text-center py-4">
+            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <i class="fas fa-check text-xl text-green-600"></i>
             </div>
-            <h4 class="text-lg font-bold text-gray-800 mb-2">Payment Successful!</h4>
-            <p class="text-gray-600 mb-6">Your order #${order.id} has been confirmed. Thank you!</p>
-            <div class="bg-gray-50 rounded-lg p-4 mb-6">
-              <div class="text-sm text-gray-600">Order Reference:</div>
-              <div class="font-mono font-bold">${order.id}</div>
-              <div class="text-sm text-gray-600 mt-2">Delivery: ${deliveryFee === 0 ? (deliveryInfo.area === 'other' ? 'Contact for quote' : 'Free') : 'KSh ' + deliveryFee}</div>
-              <div class="text-sm text-gray-600">Delivery Date: ${deliveryInfo.date} ${deliveryInfo.time}</div>
-              <div class="text-sm text-gray-600">Total Paid: KSh ${total.toLocaleString()}</div>
+            <h4 class="text-lg font-bold text-gray-800 mb-1">Payment Successful!</h4>
+            <p class="text-gray-600 text-sm mb-3">Your order #${order.id} has been confirmed. Thank you!</p>
+            <div class="bg-gray-50 rounded-lg p-3 mb-4">
+              <div class="text-xs text-gray-600 space-y-1">
+                <div><span class="font-medium">Order Reference:</span> ${order.id}</div>
+                <div><span class="font-medium">Delivery:</span> ${deliveryFee === 0 ? (deliveryInfo.area === 'other' ? 'Contact for quote' : 'Free') : 'KSh ' + deliveryFee}</div>
+                <div><span class="font-medium">Delivery Date:</span> ${deliveryInfo.date} ${deliveryInfo.time}</div>
+                <div><span class="font-medium">Total Paid:</span> KSh ${total.toLocaleString()}</div>
+              </div>
             </div>
-            <div class="flex gap-3">
-              <button id="closeSuccess" class="flex-1 border border-teal-600 text-teal-600 hover:bg-teal-50 py-3 rounded-lg font-medium">
+            <div class="flex gap-2">
+              <button id="closeSuccess" class="flex-1 border border-teal-600 text-teal-600 hover:bg-teal-50 py-2 rounded-lg text-sm font-medium">
                 Continue Shopping
               </button>
-              <button id="viewOrder" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-medium">
+              <button id="viewOrder" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-2 rounded-lg text-sm font-medium">
                 View Order
               </button>
             </div>
           </div>
         `;
         
-        // Clear cart on successful payment
         localStorage.removeItem(CART_KEY);
         localStorage.removeItem(DELIVERY_KEY);
         updateCartCount();
@@ -1316,21 +1297,18 @@
       }, 3000);
     }
     
-    // Show card payment
+    // Show card payment - UPDATED: Compact layout
     function showCardPayment() {
       const modal = document.getElementById('paymentModal');
       const content = document.getElementById('paymentContent');
       
-      // Calculate totals
       const cart = loadCart();
       const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       const deliveryInfo = loadDeliveryInfo();
       
-      // Get delivery fee
       const deliveryFee = calculateDeliveryFee(deliveryInfo.area, subtotal);
       const total = subtotal + deliveryFee;
       
-      // Format area for display
       const areaDisplayNames = {
         'nairobi-cbd': 'Nairobi CBD',
         'westlands': 'Westlands',
@@ -1346,69 +1324,87 @@
       const displayArea = areaDisplayNames[deliveryInfo.area] || deliveryInfo.area;
       
       content.innerHTML = `
-        <div class="text-center">
-          <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <i class="fas fa-credit-card text-2xl text-blue-600"></i>
-          </div>
-          <h4 class="text-lg font-bold text-gray-800 mb-2">Pay with Card</h4>
-          <p class="text-gray-600 mb-6">Enter your card details securely.</p>
-          
-          <!-- Delivery Summary -->
-          <div class="bg-gray-50 rounded-lg p-4 mb-4">
-            <h5 class="font-medium text-gray-800 mb-2">Delivery Summary</h5>
-            <div class="text-sm text-gray-600 text-left space-y-1">
-              <div><span class="font-medium">To:</span> ${deliveryInfo.name}</div>
-              <div><span class="font-medium">Phone:</span> ${deliveryInfo.phone}</div>
-              <div><span class="font-medium">Area:</span> ${displayArea}</div>
-              <div><span class="font-medium">Date:</span> ${deliveryInfo.date}</div>
-              <div><span class="font-medium">Time:</span> ${deliveryInfo.time}</div>
+        <div class="space-y-4">
+          <div class="text-center">
+            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <i class="fas fa-credit-card text-xl text-blue-600"></i>
             </div>
+            <h4 class="text-lg font-bold text-gray-800 mb-1">Pay with Card</h4>
+            <p class="text-gray-600 text-sm">Enter your card details securely.</p>
           </div>
           
-          <div class="space-y-4 mb-6">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Card Number</label>
-              <input type="text" id="cardNumber" class="w-full border border-gray-300 rounded-lg p-3" placeholder="1234 5678 9012 3456" maxlength="19">
-            </div>
-            
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Expiry Date</label>
-                <input type="text" id="cardExpiry" class="w-full border border-gray-300 rounded-lg p-3" placeholder="MM/YY">
+          <div class="bg-gray-50 rounded-lg p-3">
+            <h5 class="font-medium text-gray-800 mb-2 text-sm">Delivery Summary</h5>
+            <div class="text-xs text-gray-600 space-y-1">
+              <div class="flex justify-between">
+                <span>To:</span>
+                <span class="font-medium">${deliveryInfo.name}</span>
               </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">CVC</label>
-                <input type="text" id="cardCvc" class="w-full border border-gray-300 rounded-lg p-3" placeholder="123" maxlength="3">
+              <div class="flex justify-between">
+                <span>Phone:</span>
+                <span class="font-medium">${deliveryInfo.phone}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Area:</span>
+                <span class="font-medium">${displayArea}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Date:</span>
+                <span class="font-medium">${deliveryInfo.date}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Time:</span>
+                <span class="font-medium">${deliveryInfo.time}</span>
               </div>
             </div>
+          </div>
+          
+          <div class="space-y-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
+              <input type="text" id="cardNumber" class="w-full border border-gray-300 rounded-lg p-2 text-sm" placeholder="1234 5678 9012 3456" maxlength="19">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
+                <input type="text" id="cardExpiry" class="w-full border border-gray-300 rounded-lg p-2 text-sm" placeholder="MM/YY">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">CVC</label>
+                <input type="text" id="cardCvc" class="w-full border border-gray-300 rounded-lg p-2 text-sm" placeholder="123" maxlength="3">
+              </div>
+            </div>
             
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Cardholder Name</label>
-              <input type="text" id="cardName" class="w-full border border-gray-300 rounded-lg p-3" placeholder="John Doe">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Cardholder Name</label>
+              <input type="text" id="cardName" class="w-full border border-gray-300 rounded-lg p-2 text-sm" placeholder="John Doe">
             </div>
           </div>
           
-          <div class="bg-gray-50 rounded-lg p-4 mb-6">
-            <div class="flex justify-between mb-2">
-              <span class="text-gray-600">Order Total:</span>
-              <span class="font-bold">KSh ${subtotal.toLocaleString()}</span>
+          <div class="bg-gray-50 rounded-lg p-3">
+            <div class="space-y-1 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Order Total:</span>
+                <span class="font-bold">KSh ${subtotal.toLocaleString()}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Delivery:</span>
+                <span class="font-bold">${deliveryFee === 0 ? (deliveryInfo.area === 'other' ? 'Contact for quote' : 'Free') : 'KSh ' + deliveryFee}</span>
+              </div>
+              <div class="flex justify-between mt-2 pt-2 border-t border-gray-200">
+                <span class="text-gray-800 font-bold">Amount to pay:</span>
+                <span class="font-bold" id="cardPaymentAmount">${deliveryFee === 0 && deliveryInfo.area === 'other' ? 'Contact for quote' : 'KSh ' + total.toLocaleString()}</span>
+              </div>
+              <p class="text-xs text-gray-500 mt-2">Secure payment processing</p>
             </div>
-            <div class="flex justify-between mb-2">
-              <span class="text-gray-600">Delivery:</span>
-              <span class="font-bold">${deliveryFee === 0 ? (deliveryInfo.area === 'other' ? 'Contact for quote' : 'Free') : 'KSh ' + deliveryFee}</span>
-            </div>
-            <div class="flex justify-between mt-2 pt-2 border-t border-gray-200">
-              <span class="text-gray-800 font-bold">Amount to pay:</span>
-              <span class="font-bold text-lg" id="cardPaymentAmount">${deliveryFee === 0 && deliveryInfo.area === 'other' ? 'Contact for quote' : 'KSh ' + total.toLocaleString()}</span>
-            </div>
-            <div class="text-sm text-gray-500 mt-2">Secure payment processing</div>
           </div>
           
-          <div class="flex gap-3">
-            <button id="cancelCardPayment" class="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium">
+          <div class="flex gap-3 pt-2">
+            <button id="cancelCardPayment" class="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg text-sm font-medium">
               Cancel
             </button>
-            <button id="confirmCardPayment" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium" ${deliveryFee === 0 && deliveryInfo.area === 'other' ? 'disabled' : ''}>
+            <button id="confirmCardPayment" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-medium" ${deliveryFee === 0 && deliveryInfo.area === 'other' ? 'disabled' : ''}>
               ${deliveryFee === 0 && deliveryInfo.area === 'other' ? 'Contact for Quote' : 'Pay Now'}
             </button>
           </div>
@@ -1418,14 +1414,13 @@
       modal.classList.remove('hidden');
       modal.classList.add('flex');
       
-      // Add event listeners
       document.getElementById('cancelCardPayment').addEventListener('click', closePaymentModal);
       if (!(deliveryFee === 0 && deliveryInfo.area === 'other')) {
         document.getElementById('confirmCardPayment').addEventListener('click', processCardPayment);
       }
     }
     
-    // Process card payment - UPDATED with order saving
+    // Process card payment
     function processCardPayment() {
       const cardNumber = document.getElementById('cardNumber').value;
       const cardExpiry = document.getElementById('cardExpiry').value;
@@ -1437,67 +1432,64 @@
         return;
       }
       
-      // Calculate totals
       const cart = loadCart();
       const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       const deliveryInfo = loadDeliveryInfo();
       
-      // Get delivery fee
       const deliveryFee = calculateDeliveryFee(deliveryInfo.area, subtotal);
       const total = subtotal + deliveryFee;
       
-      // Simulate payment processing
       document.getElementById('paymentContent').innerHTML = `
-        <div class="text-center py-8">
-          <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <i class="fas fa-spinner fa-spin text-2xl text-blue-600"></i>
+        <div class="text-center py-4">
+          <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 animate-pulse">
+            <i class="fas fa-spinner fa-spin text-xl text-blue-600"></i>
           </div>
-          <h4 class="text-lg font-bold text-gray-800 mb-2">Processing Payment</h4>
-          <p class="text-gray-600 mb-4">Please wait while we process your payment.</p>
-          <div class="bg-gray-50 rounded-lg p-4 mb-4">
-            <div class="flex justify-between mb-1">
-              <span class="text-gray-600">Amount:</span>
-              <span class="font-bold">KSh ${total.toLocaleString()}</span>
-            </div>
-            <div class="flex justify-between mt-2 pt-2 border-t border-gray-200">
-              <span class="text-gray-800">Delivery to:</span>
-              <span class="font-medium">${deliveryInfo.area}</span>
+          <h4 class="text-lg font-bold text-gray-800 mb-1">Processing Payment</h4>
+          <p class="text-gray-600 text-sm mb-3">Please wait while we process your payment.</p>
+          <div class="bg-gray-50 rounded-lg p-3">
+            <div class="text-xs text-gray-600">
+              <div class="flex justify-between mb-1">
+                <span>Amount:</span>
+                <span class="font-bold">KSh ${total.toLocaleString()}</span>
+              </div>
+              <div class="flex justify-between mt-1 pt-1 border-t border-gray-200">
+                <span class="text-gray-800">Delivery to:</span>
+                <span class="font-medium">${deliveryInfo.area}</span>
+              </div>
             </div>
           </div>
         </div>
       `;
       
-      // Simulate successful payment after 3 seconds - UPDATED with order creation
       setTimeout(() => {
-        // Create and save the order
         const order = createOrderFromCart('card');
         
         document.getElementById('paymentContent').innerHTML = `
-          <div class="text-center py-8">
-            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i class="fas fa-check text-2xl text-blue-600"></i>
+          <div class="text-center py-4">
+            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <i class="fas fa-check text-xl text-blue-600"></i>
             </div>
-            <h4 class="text-lg font-bold text-gray-800 mb-2">Payment Successful!</h4>
-            <p class="text-gray-600 mb-6">Your order #${order.id} has been confirmed. Thank you!</p>
-            <div class="bg-gray-50 rounded-lg p-4 mb-6">
-              <div class="text-sm text-gray-600">Order Reference:</div>
-              <div class="font-mono font-bold">${order.id}</div>
-              <div class="text-sm text-gray-600 mt-2">Delivery: ${deliveryFee === 0 ? (deliveryInfo.area === 'other' ? 'Contact for quote' : 'Free') : 'KSh ' + deliveryFee}</div>
-              <div class="text-sm text-gray-600">Delivery Date: ${deliveryInfo.date} ${deliveryInfo.time}</div>
-              <div class="text-sm text-gray-600">Total Paid: KSh ${total.toLocaleString()}</div>
+            <h4 class="text-lg font-bold text-gray-800 mb-1">Payment Successful!</h4>
+            <p class="text-gray-600 text-sm mb-3">Your order #${order.id} has been confirmed. Thank you!</p>
+            <div class="bg-gray-50 rounded-lg p-3 mb-4">
+              <div class="text-xs text-gray-600 space-y-1">
+                <div><span class="font-medium">Order Reference:</span> ${order.id}</div>
+                <div><span class="font-medium">Delivery:</span> ${deliveryFee === 0 ? (deliveryInfo.area === 'other' ? 'Contact for quote' : 'Free') : 'KSh ' + deliveryFee}</div>
+                <div><span class="font-medium">Delivery Date:</span> ${deliveryInfo.date} ${deliveryInfo.time}</div>
+                <div><span class="font-medium">Total Paid:</span> KSh ${total.toLocaleString()}</div>
+              </div>
             </div>
-            <div class="flex gap-3">
-              <button id="closeCardSuccess" class="flex-1 border border-teal-600 text-teal-600 hover:bg-teal-50 py-3 rounded-lg font-medium">
+            <div class="flex gap-2">
+              <button id="closeCardSuccess" class="flex-1 border border-teal-600 text-teal-600 hover:bg-teal-50 py-2 rounded-lg text-sm font-medium">
                 Continue Shopping
               </button>
-              <button id="viewCardOrder" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-medium">
+              <button id="viewCardOrder" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-2 rounded-lg text-sm font-medium">
                 View Order
               </button>
             </div>
           </div>
         `;
         
-        // Clear cart on successful payment
         localStorage.removeItem(CART_KEY);
         localStorage.removeItem(DELIVERY_KEY);
         updateCartCount();
