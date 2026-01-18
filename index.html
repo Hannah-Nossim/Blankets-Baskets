@@ -121,6 +121,19 @@
       border-radius: 0.75rem;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
+    /* Add product image styles */
+    .product-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 0.5rem;
+    }
+    .product-image-placeholder {
+      background: linear-gradient(45deg, #f0f9ff, #dcfce7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -289,8 +302,9 @@
           <i class="fas fa-exclamation-triangle mr-1"></i> Low Stock
         </div>
         
-        <div class="aspect-video rounded-lg bg-gradient-to-r from-amber-100 to-orange-100 flex items-center justify-center mb-4">
-          <i class="fas fa-heart text-4xl text-amber-300"></i>
+        <!-- Product Image - Updated -->
+        <div class="aspect-video rounded-lg overflow-hidden mb-4">
+          <img src="assets/images/classic_couple_kit.jpg" alt="Classic Couple Kit" class="product-image">
         </div>
         
         <!-- Trust Signals -->
@@ -369,8 +383,9 @@
           <i class="fas fa-exclamation-triangle mr-1"></i> Low Stock
         </div>
         
-        <div class="aspect-video rounded-lg bg-gradient-to-r from-blue-100 to-cyan-100 flex items-center justify-center mb-4">
-          <i class="fas fa-users text-4xl text-blue-300"></i>
+        <!-- Product Image - Updated -->
+        <div class="aspect-video rounded-lg overflow-hidden mb-4">
+          <img src="assets/images/family_fun_kit.jpg" alt="Family Fun Kit" class="product-image">
         </div>
         
         <!-- Trust Signals -->
@@ -446,8 +461,9 @@
           15% OFF
         </div>
         
-        <div class="aspect-video rounded-lg bg-gradient-to-r from-red-100 to-orange-100 flex items-center justify-center mb-4">
-          <i class="fas fa-fire text-4xl text-red-300"></i>
+        <!-- Product Image - Updated -->
+        <div class="aspect-video rounded-lg overflow-hidden mb-4">
+          <img src="assets/images/choma_box_kit.jpg" alt="Choma Box - Grill Master" class="product-image">
         </div>
         
         <!-- Trust Signals -->
@@ -721,37 +737,31 @@
       }
     }
     
-    // Product Data
+    // Product Data - Updated image property name
     const PRODUCTS = {
       'classic-couple': { 
         name: 'Classic Couple Kit', 
-        price: 1200, 
+        price: 1700, // Using the sale price from the HTML
+        originalPrice: 2000,
         category: 'couple',
-        pax: 2
+        pax: 2,
+        image: 'assets/images/classic_couple_kit.jpg'
       },
       'family-fun': { 
-        name: 'Family Fun Kit', 
-        price: 3800, 
+        name: 'Family Fun Kit - Premium Edition', 
+        price: 3655, // Using the sale price from the HTML
+        originalPrice: 4300,
         category: 'family',
-        pax: 5
+        pax: 5,
+        image: 'assets/images/family_fun_kit.jpg'
       },
       'choma-box': { 
-        name: 'Choma Box', 
-        price: 4200, 
+        name: 'Choma Box - Grill Master', 
+        price: 5525, // Using the sale price from the HTML
+        originalPrice: 6500,
         category: 'choma',
-        pax: 5
-      },
-      'vegan-chill': { 
-        name: 'Vegan Chill Pack', 
-        price: 3000, 
-        category: 'vegan',
-        pax: 5
-      },
-      'team-outing': { 
-        name: 'Team Outing Kit', 
-        price: 7500, 
-        category: 'team',
-        pax: 10
+        pax: 5,
+        image: 'assets/images/choma_box.jpg'
       }
     };
     
@@ -771,7 +781,8 @@
           name: product.name,
           price: product.price,
           quantity: quantity,
-          category: product.category
+          category: product.category,
+          image: product.image
         });
       }
       
