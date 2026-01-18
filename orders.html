@@ -55,6 +55,7 @@
     .status-delivered { background-color: #d1fae5; color: #065f46; }
     .status-shipped { background-color: #dbeafe; color: #1e40af; }
     .status-cancelled { background-color: #fee2e2; color: #991b1b; }
+    .status-ready { background-color: #f3e8ff; color: #7c3aed; }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -251,6 +252,9 @@
                 <button id="cancelOrderBtn" class="w-full border border-red-600 text-red-600 hover:bg-red-50 py-3 rounded-lg font-medium hidden">
                   <i class="fas fa-times mr-2"></i>Cancel Order
                 </button>
+                <button id="markDeliveredBtn" class="w-full border border-green-600 text-green-600 hover:bg-green-50 py-3 rounded-lg font-medium hidden">
+                  <i class="fas fa-check-circle mr-2"></i>Mark as Delivered
+                </button>
                 <button id="trackOrderBtn" class="w-full border border-teal-600 text-teal-600 hover:bg-teal-50 py-3 rounded-lg font-medium">
                   <i class="fas fa-map-marker-alt mr-2"></i>Track Order
                 </button>
@@ -371,6 +375,7 @@
     // Status configurations
     const ORDER_STATUS = {
       PROCESSING: 'processing',
+      READY: 'ready',
       SHIPPED: 'shipped',
       DELIVERED: 'delivered',
       CANCELLED: 'cancelled'
@@ -378,10 +383,69 @@
     
     const STATUS_DISPLAY = {
       'processing': { text: 'Processing', class: 'status-processing' },
+      'ready': { text: 'Ready for Dispatch', class: 'status-ready' },
       'shipped': { text: 'Shipped', class: 'status-shipped' },
       'delivered': { text: 'Delivered', class: 'status-delivered' },
       'cancelled': { text: 'Cancelled', class: 'status-cancelled' }
     };
+    
+    // NEW: Simulate order progression based on time
+    function simulateOrderProgression() {
+      const orders = loadOrders();
+      const now = new Date();
+      let updated = false;
+      
+      orders.forEach(order => {
+        if (order.status === ORDER_STATUS.CANCELLED || order.status === ORDER_STATUS.DELIVERED) {
+          return; // Skip cancelled or already delivered orders
+        }
+        
+        const orderDate = new Date(order.date);
+        const hoursSinceOrder = (now - orderDate) / (1000 * 60 * 60); // Convert to hours
+        
+        // Simulate status progression based on time
+        if (hoursSinceOrder > 48 && order.status === ORDER_STATUS.PROCESSING) {
+          // After 48 hours, mark as "Ready for Dispatch"
+          order.status = ORDER_STATUS.READY;
+          if (!order.timeline.find(e => e.event === 'order_ready')) {
+            order.timeline.push({
+              event: 'order_ready',
+              description: 'Order packed and ready for dispatch',
+              timestamp: new Date(orderDate.getTime() + 48 * 60 * 60 * 1000).toISOString()
+            });
+          }
+          updated = true;
+        } else if (hoursSinceOrder > 72 && (order.status === ORDER_STATUS.READY || order.status === ORDER_STATUS.PROCESSING)) {
+          // After 72 hours, mark as "Shipped"
+          order.status = ORDER_STATUS.SHIPPED;
+          if (!order.timeline.find(e => e.event === 'order_shipped')) {
+            order.timeline.push({
+              event: 'order_shipped',
+              description: 'Order picked up by delivery partner',
+              timestamp: new Date(orderDate.getTime() + 72 * 60 * 60 * 1000).toISOString()
+            });
+          }
+          updated = true;
+        } else if (hoursSinceOrder > 96 && (order.status === ORDER_STATUS.SHIPPED || order.status === ORDER_STATUS.READY || order.status === ORDER_STATUS.PROCESSING)) {
+          // After 96 hours, mark as "Delivered"
+          order.status = ORDER_STATUS.DELIVERED;
+          if (!order.timeline.find(e => e.event === 'order_delivered')) {
+            order.timeline.push({
+              event: 'order_delivered',
+              description: 'Order delivered successfully',
+              timestamp: new Date(orderDate.getTime() + 96 * 60 * 60 * 1000).toISOString()
+            });
+          }
+          updated = true;
+        }
+      });
+      
+      if (updated) {
+        saveOrders(orders);
+      }
+      
+      return updated;
+    }
     
     // Load orders from localStorage
     function loadOrders() {
@@ -552,7 +616,7 @@
                 <button class="view-order-btn px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium" data-order-id="${order.id}">
                   View Details
                 </button>
-                ${order.status === ORDER_STATUS.PROCESSING ? `
+                ${order.status === ORDER_STATUS.PROCESSING || order.status === ORDER_STATUS.READY || order.status === ORDER_STATUS.SHIPPED ? `
                   <button class="cancel-order-btn px-4 py-2 border border-red-600 text-red-600 hover:bg-red-50 rounded-lg font-medium" data-order-id="${order.id}">
                     Cancel
                   </button>
@@ -668,11 +732,20 @@
       
       // Show/hide cancel button
       const cancelBtn = document.getElementById('cancelOrderBtn');
-      if (order.status === ORDER_STATUS.PROCESSING) {
+      if (order.status === ORDER_STATUS.PROCESSING || order.status === ORDER_STATUS.READY || order.status === ORDER_STATUS.SHIPPED) {
         cancelBtn.classList.remove('hidden');
         cancelBtn.dataset.orderId = order.id;
       } else {
         cancelBtn.classList.add('hidden');
+      }
+      
+      // Show/hide "Mark as Delivered" button
+      const markDeliveredBtn = document.getElementById('markDeliveredBtn');
+      if (order.status !== ORDER_STATUS.DELIVERED && order.status !== ORDER_STATUS.CANCELLED) {
+        markDeliveredBtn.classList.remove('hidden');
+        markDeliveredBtn.dataset.orderId = order.id;
+      } else {
+        markDeliveredBtn.classList.add('hidden');
       }
       
       // Set reorder button
@@ -719,6 +792,35 @@
       }
       
       alert('Order has been cancelled successfully.');
+    }
+    
+    // NEW: Mark order as delivered
+    function markOrderAsDelivered(orderId) {
+      const orders = loadOrders();
+      const orderIndex = orders.findIndex(o => o.id === orderId);
+      
+      if (orderIndex === -1) return;
+      
+      // Update order status
+      orders[orderIndex].status = ORDER_STATUS.DELIVERED;
+      orders[orderIndex].timeline.push({
+        event: 'order_delivered',
+        description: 'Order delivered successfully',
+        timestamp: new Date().toISOString()
+      });
+      
+      saveOrders(orders);
+      
+      // Update UI
+      const currentFilter = document.querySelector('.filter-tab.border-teal-600').dataset.filter;
+      renderOrders(currentFilter);
+      
+      // If modal is open, update it
+      if (document.getElementById('orderDetailsModal').classList.contains('flex')) {
+        showOrderDetails(orderId);
+      }
+      
+      alert('Order marked as delivered.');
     }
     
     // Reorder items
@@ -772,6 +874,9 @@
     
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
+      // Simulate order progression based on time
+      simulateOrderProgression();
+      
       // Load and render orders
       renderOrders('all');
       
@@ -816,10 +921,29 @@
         cancelOrder(orderId);
       });
       
+      // NEW: Mark as delivered button
+      document.getElementById('markDeliveredBtn').addEventListener('click', (e) => {
+        const orderId = e.target.dataset.orderId;
+        markOrderAsDelivered(orderId);
+      });
+      
       // Track order button
       document.getElementById('trackOrderBtn').addEventListener('click', (e) => {
         const orderId = e.target.dataset.orderId;
-        alert(`Tracking for order #${orderId} would be implemented here.`);
+        const orders = loadOrders();
+        const order = orders.find(o => o.id === orderId);
+        
+        if (order) {
+          const statusMessages = {
+            'processing': 'Your order is being prepared.',
+            'ready': 'Your order is packed and ready for dispatch.',
+            'shipped': `Your order is out for delivery to ${order.deliveryInfo.area}.`,
+            'delivered': 'Your order has been delivered!',
+            'cancelled': 'This order has been cancelled.'
+          };
+          
+          alert(`Order #${orderId}\nStatus: ${STATUS_DISPLAY[order.status].text}\n\n${statusMessages[order.status] || 'Tracking information will be available soon.'}`);
+        }
       });
       
       // Mobile menu (same as cart.html)
